@@ -21,6 +21,9 @@ return new class extends Migration
             'delete_users',
             'admin_users',
 
+            // Role management
+            'manage_roles',
+
             // Product management
             'add_products',
             'edit_products',
