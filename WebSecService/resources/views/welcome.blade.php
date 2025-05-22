@@ -1,162 +1,608 @@
 @extends('layouts.master')
-@section('title', 'Welcome to Modern Store')
+@section('title', 'Welcome')
 @section('content')
-    <div class="container py-5">
-        <!-- Hero Section -->
-        <div class="row mb-5 align-items-center">
-            <div class="col-lg-6">
-                <h1 class="display-4 fw-bold mb-4">Welcome to Modern Store</h1>
-                <p class="lead mb-4">Experience a new way of shopping with our curated selection of premium products. We pride ourselves on quality, affordability, and exceptional customer service.</p>
-                <div class="d-grid gap-2 d-sm-flex mt-4">
-                    <a href="{{ route('products_list') }}" class="btn btn-primary btn-lg px-4">Browse Products</a>
-                    @guest
-                    <a href="{{ route('register') }}" class="btn btn-gradient btn-lg px-4">Join Now</a>
-                    @endguest
+<div class="home-container">
+    <!-- Hero Section with SVG Background -->
+    <section class="hero-section">
+        <div class="hero-background">
+            <img src="{{ asset('images/hero-texture.svg') }}" alt="Decorative background" class="hero-bg-image">
+        </div>
+        
+        <div class="hero-content">
+            <div class="hero-text">
+                <h1 class="hero-title">Welcome to GreenTea</h1>
+                <p class="hero-subtitle">Premium quality teas for your refined palate</p>
+                <div class="hero-cta-group">
+                    <a href="{{ route('products_list') }}" class="btn-green btn-primary btn-green-lg">Browse Collection</a>
+                    <a href="#about-us" class="btn-green btn-outline btn-green-lg">Learn More</a>
                 </div>
             </div>
-            <div class="col-lg-6 mt-5 mt-lg-0">
-                <div class="card bg-primary text-white shadow">
-                    <div class="card-body p-4">
-                        <h3 class="card-title mb-3">Why Choose Us?</h3>
-                        <ul class="list-unstyled">
-                            <li class="mb-3"><i class="bi bi-check-circle-fill me-2"></i> Top-quality products at competitive prices</li>
-                            <li class="mb-3"><i class="bi bi-check-circle-fill me-2"></i> Fast and secure payment processing</li>
-                            <li class="mb-3"><i class="bi bi-check-circle-fill me-2"></i> Excellent customer support</li>
-                            <li class="mb-3"><i class="bi bi-check-circle-fill me-2"></i> Quick delivery to your doorstep</li>
-                            <li><i class="bi bi-check-circle-fill me-2"></i> Hassle-free returns and refunds</li>
-                        </ul>
+            
+            <div class="hero-visual">
+                <div class="featured-product">
+                    <div class="product-image-container">
+                        <div class="product-badge">Featured</div>
+                        <img src="{{ asset('images/leaf-pattern.svg') }}" alt="Premium tea" class="product-image">
                     </div>
                 </div>
             </div>
         </div>
-
-        <!-- Featured Categories -->
-        <div class="row mb-5">
-            <div class="col-12 text-center mb-4">
-                <h2 class="fw-bold">Our Product Categories</h2>
-                <hr class="w-25 mx-auto">
-            </div>
+    </section>
+    
+    <!-- Features Section -->
+    <section class="features-section" id="about-us">
+        <div class="container-app">
+            <h2 class="section-title">Why Choose Our Tea</h2>
             
-            <div class="col-md-4 mb-4">
-                <div class="card shadow-sm h-100">
-                    <div class="card-body text-center p-4">
-                        <i class="bi bi-laptop fs-1 text-primary mb-3"></i>
-                        <h3 class="card-title h4">Electronics</h3>
-                        <p class="card-text">Discover the latest tech gadgets, computers, and accessories for your digital lifestyle.</p>
-                        <a href="{{ route('products_list') }}" class="btn btn-outline-primary mt-3">Shop Electronics</a>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bi bi-award"></i>
                     </div>
+                    <h3>Premium Quality</h3>
+                    <p>Sourced from the finest tea gardens around the world, ensuring exceptional flavor with every cup.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bi bi-heart"></i>
+                    </div>
+                    <h3>Health Benefits</h3>
+                    <p>Rich in antioxidants and natural compounds that promote wellness and a healthy lifestyle.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bi bi-truck"></i>
+                    </div>
+                    <h3>Fast Delivery</h3>
+                    <p>Enjoy quick and reliable shipping directly to your doorstep, with careful packaging.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bi bi-leaf"></i>
+                    </div>
+                    <h3>Eco-Friendly</h3>
+                    <p>Committed to sustainable farming practices and environmentally conscious packaging.</p>
                 </div>
             </div>
+        </div>
+    </section>
+    
+    <!-- Collections Showcase -->
+    <section class="collections-section">
+        <div class="container-app">
+            <h2 class="section-title">Our Collections</h2>
+            <p class="section-subtitle">Explore our carefully curated selections</p>
             
-            <div class="col-md-4 mb-4">
-                <div class="card shadow-sm h-100">
-                    <div class="card-body text-center p-4">
-                        <i class="bi bi-house-door fs-1 text-primary mb-3"></i>
-                        <h3 class="card-title h4">Home & Living</h3>
-                        <p class="card-text">Transform your living space with our collection of furniture, decor, and household essentials.</p>
-                        <a href="{{ route('products_list') }}" class="btn btn-outline-primary mt-3">Shop Home</a>
+            <div class="collections-slider">
+                <div class="collection-card">
+                    <div class="collection-image" style="background-color: #A0C676;">
+                        <!-- Placeholder for image -->
+                        <div class="collection-icon"><i class="bi bi-cup-hot"></i></div>
+                    </div>
+                    <div class="collection-info">
+                        <h3>Green Tea</h3>
+                        <p>Fresh and vibrant flavors with numerous health benefits</p>
+                        <a href="{{ route('products_list') }}" class="btn-link">Explore <i class="bi bi-arrow-right"></i></a>
                     </div>
                 </div>
-            </div>
-            
-            <div class="col-md-4 mb-4">
-                <div class="card shadow-sm h-100">
-                    <div class="card-body text-center p-4">
-                        <i class="bi bi-palette fs-1 text-primary mb-3"></i>
-                        <h3 class="card-title h4">Art & Decor</h3>
-                        <p class="card-text">Add beauty to your surroundings with our artistic prints, paintings, and decorative items.</p>
-                        <a href="{{ route('products_list') }}" class="btn btn-outline-primary mt-3">Shop Art</a>
+                
+                <div class="collection-card">
+                    <div class="collection-image" style="background-color: #D1AB51;">
+                        <!-- Placeholder for image -->
+                        <div class="collection-icon"><i class="bi bi-cup"></i></div>
+                    </div>
+                    <div class="collection-info">
+                        <h3>Black Tea</h3>
+                        <p>Rich and robust flavors perfect for everyday enjoyment</p>
+                        <a href="{{ route('products_list') }}" class="btn-link">Explore <i class="bi bi-arrow-right"></i></a>
+                    </div>
+                </div>
+                
+                <div class="collection-card">
+                    <div class="collection-image" style="background-color: #5A8A72;">
+                        <!-- Placeholder for image -->
+                        <div class="collection-icon"><i class="bi bi-flower1"></i></div>
+                    </div>
+                    <div class="collection-info">
+                        <h3>Herbal Infusions</h3>
+                        <p>Caffeine-free blends with therapeutic properties</p>
+                        <a href="{{ route('products_list') }}" class="btn-link">Explore <i class="bi bi-arrow-right"></i></a>
                     </div>
                 </div>
             </div>
         </div>
-
-        <!-- About Our Store -->
-        <div class="row mb-5">
-            <div class="col-12">
-                <div class="card shadow-sm">
-                    <div class="card-body p-4">
-                        <div class="row align-items-center">
-                            <div class="col-md-6">
-                                <h2 class="card-title fw-bold mb-4">About Modern Store</h2>
-                                <p>Founded with a passion for delivering exceptional products and service, Modern Store has quickly grown to become a trusted name in online retail. Our mission is to simplify your shopping experience while offering premium quality products across multiple categories.</p>
-                                <p>What sets us apart is our commitment to customer satisfaction. We carefully select each product in our inventory, ensuring that it meets our stringent quality standards. Our dedicated support team is always ready to assist you with any questions or concerns.</p>
-                                <p>Join thousands of satisfied customers who make Modern Store their go-to shopping destination!</p>
-                            </div>
-                            <div class="col-md-6 mt-4 mt-md-0 text-center">
-                                <i class="bi bi-shop display-1 text-primary"></i>
-                            </div>
+    </section>
+    
+    <!-- Testimonials -->
+    <section class="testimonials-section">
+        <div class="container-app">
+            <h2 class="section-title">What Our Customers Say</h2>
+            
+            <div class="testimonials-container">
+                <div class="testimonial-card">
+                    <div class="testimonial-rating">
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                    </div>
+                    <p class="testimonial-text">"The matcha green tea is simply exceptional. The flavor is so pure and vibrant. It has become an essential part of my morning routine."</p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar" style="background-color: #688c50;">J</div>
+                        <div class="author-name">John D.</div>
+                    </div>
+                </div>
+                
+                <div class="testimonial-card">
+                    <div class="testimonial-rating">
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-half"></i>
+                    </div>
+                    <p class="testimonial-text">"The selection is impressive and the quality is consistently excellent. The chamomile blend helps me relax after a long day. Highly recommended!"</p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar" style="background-color: #688c50;">S</div>
+                        <div class="author-name">Sarah M.</div>
+                    </div>
+                </div>
+                
+                <div class="testimonial-card">
+                    <div class="testimonial-rating">
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                    </div>
+                    <p class="testimonial-text">"Fast delivery and the packaging is beautiful and eco-friendly. The tea is fresh and the aroma is delightful. Will definitely purchase again!"</p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar" style="background-color: #688c50;">R</div>
+                        <div class="author-name">Rebecca T.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Newsletter Section -->
+    <section class="newsletter-section">
+        <div class="container-app">
+            <div class="newsletter-container">
+                <div class="newsletter-bg" style="background-image: url({{ asset('images/background-pattern.svg') }})"></div>
+                <div class="newsletter-content">
+                    <h2>Join Our Tea Community</h2>
+                    <p>Subscribe to receive updates, special offers, and brewing tips right in your inbox.</p>
+                    <form class="newsletter-form">
+                        <div class="form-group">
+                            <input type="email" class="form-control-green" placeholder="Enter your email address">
+                            <button type="submit" class="btn-green btn-primary">Subscribe</button>
                         </div>
-                    </div>
+                    </form>
                 </div>
             </div>
         </div>
+    </section>
+</div>
 
-        <!-- Customer Benefits -->
-        <div class="row mb-5">
-            <div class="col-12 text-center mb-4">
-                <h2 class="fw-bold">Customer Benefits</h2>
-                <hr class="w-25 mx-auto">
-            </div>
-
-            <div class="col-md-3 mb-4">
-                <div class="card shadow-sm h-100">
-                    <div class="card-body text-center p-4">
-                        <i class="bi bi-credit-card fs-1 text-primary mb-3"></i>
-                        <h3 class="card-title h5">Store Credits</h3>
-                        <p class="card-text">Earn and use store credits for future purchases.</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-3 mb-4">
-                <div class="card shadow-sm h-100">
-                    <div class="card-body text-center p-4">
-                        <i class="bi bi-gift fs-1 text-primary mb-3"></i>
-                        <h3 class="card-title h5">Special Offers</h3>
-                        <p class="card-text">Exclusive deals and promotions for members.</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-3 mb-4">
-                <div class="card shadow-sm h-100">
-                    <div class="card-body text-center p-4">
-                        <i class="bi bi-truck fs-1 text-primary mb-3"></i>
-                        <h3 class="card-title h5">Fast Shipping</h3>
-                        <p class="card-text">Quick and reliable delivery options.</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-3 mb-4">
-                <div class="card shadow-sm h-100">
-                    <div class="card-body text-center p-4">
-                        <i class="bi bi-shield-check fs-1 text-primary mb-3"></i>
-                        <h3 class="card-title h5">Secure Shopping</h3>
-                        <p class="card-text">Safe and protected shopping experience.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Call to Action -->
-        <div class="row">
-            <div class="col-12 text-center">
-                <div class="card bg-primary text-white shadow">
-                    <div class="card-body p-5">
-                        <h2 class="fw-bold mb-3">Ready to Start Shopping?</h2>
-                        <p class="lead mb-4">Join our community of happy customers and discover the Modern Store difference!</p>
-                        <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
-                            <a href="{{ route('products_list') }}" class="btn btn-light btn-lg px-4 me-sm-3">Browse Products</a>
-                            @guest
-                            <a href="{{ route('register') }}" class="btn btn-gradient btn-lg px-4">Create Account</a>
-                            @endguest
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+<style>
+    /* Hero Section */
+    .hero-section {
+        position: relative;
+        min-height: 80vh;
+        display: flex;
+        align-items: center;
+        overflow: hidden;
+        margin-top: -1rem;
+    }
+    
+    .hero-background {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+    }
+    
+    .hero-bg-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .hero-content {
+        width: 100%;
+        max-width: var(--container-max-width);
+        margin: 0 auto;
+        padding: 0 1rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+    
+    .hero-text {
+        flex: 1;
+        color: white;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        margin-bottom: 2rem;
+    }
+    
+    .hero-title {
+        font-size: var(--font-size-4xl);
+        font-weight: 700;
+        margin-bottom: 1rem;
+        line-height: 1.2;
+    }
+    
+    .hero-subtitle {
+        font-size: var(--font-size-xl);
+        margin-bottom: 2rem;
+        opacity: 0.9;
+    }
+    
+    .hero-cta-group {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+    
+    .hero-visual {
+        flex: 1;
+        min-width: 300px;
+        display: flex;
+        justify-content: center;
+    }
+    
+    .featured-product {
+        width: 300px;
+        height: 400px;
+        position: relative;
+    }
+    
+    .product-image-container {
+        background-color: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(10px);
+        border-radius: var(--radius-lg);
+        height: 100%;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1.5rem;
+        box-shadow: 0 15px 25px rgba(0,0,0,0.15);
+        position: relative;
+        overflow: hidden;
+        transform: rotateY(10deg) rotateX(5deg);
+        perspective: 1000px;
+    }
+    
+    .product-badge {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        background-color: var(--secondary);
+        color: var(--gray-900);
+        font-weight: 600;
+        font-size: var(--font-size-sm);
+        padding: 0.25rem 0.75rem;
+        border-radius: var(--radius-full);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .product-image {
+        width: 100%;
+        height: auto;
+        object-fit: contain;
+        filter: drop-shadow(0 10px 15px rgba(0,0,0,0.1));
+    }
+    
+    /* Features Section */
+    .features-section {
+        padding: var(--section-spacing) 0;
+        background-color: var(--card-bg);
+    }
+    
+    .section-title {
+        text-align: center;
+        font-size: var(--font-size-3xl);
+        font-weight: 700;
+        margin-bottom: 2.5rem;
+        color: var(--primary);
+    }
+    
+    .section-subtitle {
+        text-align: center;
+        font-size: var(--font-size-lg);
+        color: var(--gray-600);
+        margin-top: -2rem;
+        margin-bottom: 2.5rem;
+    }
+    
+    .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 2rem;
+    }
+    
+    .feature-card {
+        padding: 2rem;
+        text-align: center;
+        border-radius: var(--radius);
+        background-color: var(--body-bg);
+        box-shadow: var(--shadow);
+        transition: transform var(--transition), box-shadow var(--transition);
+    }
+    
+    .feature-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-lg);
+    }
+    
+    .feature-icon {
+        width: 60px;
+        height: 60px;
+        font-size: 28px;
+        background-color: var(--primary-light);
+        color: var(--primary-dark);
+        border-radius: var(--radius-full);
+        margin: 0 auto 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .feature-card h3 {
+        font-weight: 600;
+        font-size: var(--font-size-xl);
+        margin-bottom: 1rem;
+    }
+    
+    .feature-card p {
+        color: var(--gray-600);
+        line-height: 1.6;
+    }
+    
+    /* Collections Section */
+    .collections-section {
+        padding: var(--section-spacing) 0;
+        background-color: var(--body-bg);
+    }
+    
+    .collections-slider {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+        margin-top: 2rem;
+    }
+    
+    .collection-card {
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+        box-shadow: var(--shadow);
+        background-color: var(--card-bg);
+        transition: transform var(--transition), box-shadow var(--transition);
+    }
+    
+    .collection-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-lg);
+    }
+    
+    .collection-image {
+        height: 200px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .collection-icon {
+        font-size: 50px;
+        color: rgba(255, 255, 255, 0.9);
+    }
+    
+    .collection-info {
+        padding: 1.5rem;
+    }
+    
+    .collection-info h3 {
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+    
+    .collection-info p {
+        color: var(--gray-600);
+        margin-bottom: 1rem;
+    }
+    
+    .btn-link {
+        color: var(--primary);
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        text-decoration: none;
+        transition: color var(--transition-fast);
+    }
+    
+    .btn-link i {
+        margin-left: 0.25rem;
+        transition: transform var(--transition-fast);
+    }
+    
+    .btn-link:hover {
+        color: var(--primary-dark);
+    }
+    
+    .btn-link:hover i {
+        transform: translateX(3px);
+    }
+    
+    /* Testimonials Section */
+    .testimonials-section {
+        padding: var(--section-spacing) 0;
+        background-color: var(--card-bg);
+    }
+    
+    .testimonials-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+    }
+    
+    .testimonial-card {
+        padding: 2rem;
+        border-radius: var(--radius);
+        background-color: var(--body-bg);
+        box-shadow: var(--shadow);
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .testimonial-rating {
+        margin-bottom: 1rem;
+        color: var(--secondary);
+    }
+    
+    .testimonial-text {
+        font-style: italic;
+        margin-bottom: 1.5rem;
+        line-height: 1.7;
+        flex-grow: 1;
+    }
+    
+    .testimonial-author {
+        display: flex;
+        align-items: center;
+    }
+    
+    .author-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: var(--radius-full);
+        color: white;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 1rem;
+    }
+    
+    .author-name {
+        font-weight: 500;
+    }
+    
+    /* Newsletter Section */
+    .newsletter-section {
+        padding: var(--section-spacing) 0;
+        background-color: var(--body-bg);
+    }
+    
+    .newsletter-container {
+        position: relative;
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+        padding: 3rem;
+    }
+    
+    .newsletter-bg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+        background-size: cover;
+        background-position: center;
+        opacity: 0.8;
+    }
+    
+    .newsletter-content {
+        max-width: 600px;
+        margin: 0 auto;
+        text-align: center;
+    }
+    
+    .newsletter-content h2 {
+        font-weight: 700;
+        font-size: var(--font-size-2xl);
+        margin-bottom: 1rem;
+    }
+    
+    .newsletter-content p {
+        margin-bottom: 2rem;
+    }
+    
+    .newsletter-form .form-group {
+        display: flex;
+        gap: 0.5rem;
+    }
+    
+    .newsletter-form .form-control-green {
+        flex: 1;
+        padding: 0.75rem 1rem;
+    }
+    
+    @media (max-width: 991.98px) {
+        .hero-content {
+            flex-direction: column-reverse;
+        }
+        
+        .hero-text {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        .hero-cta-group {
+            justify-content: center;
+        }
+        
+        .hero-visual {
+            margin-bottom: 2rem;
+        }
+        
+        .newsletter-form .form-group {
+            flex-direction: column;
+        }
+    }
+    
+    @media (max-width: 767.98px) {
+        .hero-title {
+            font-size: var(--font-size-3xl);
+        }
+        
+        .hero-subtitle {
+            font-size: var(--font-size-lg);
+        }
+        
+        .featured-product {
+            width: 250px;
+            height: 350px;
+        }
+    }
+    
+    @media (max-width: 575.98px) {
+        .hero-section {
+            min-height: 70vh;
+        }
+        
+        .hero-title {
+            font-size: var(--font-size-2xl);
+        }
+        
+        .section-title {
+            font-size: var(--font-size-2xl);
+        }
+        
+        .feature-card, .testimonial-card, .newsletter-container {
+            padding: 1.5rem;
+        }
+    }
+</style>
 @endsection
 
