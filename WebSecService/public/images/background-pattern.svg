@@ -1,0 +1,51 @@
+<svg width="800" height="800" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Tea Leaf Pattern -->
+    <pattern id="leafPattern" patternUnits="userSpaceOnUse" width="100" height="100" patternTransform="rotate(45)">
+      <path d="M20,50 Q30,40 28,60 Q40,50 32,70 Q45,65 30,80 Q40,90 20,85 Q10,95 10,80 Q-5,85 5,70 Q-10,70 5,60 Q-5,50 10,55 Q5,40 20,50" 
+            fill="#688c5020" stroke="none" />
+    </pattern>
+    
+    <!-- Subtle Grid Pattern -->
+    <pattern id="gridPattern" patternUnits="userSpaceOnUse" width="40" height="40" patternTransform="rotate(45)">
+      <path d="M 0,20 L 40,20 M 20,0 L 20,40" stroke="#68825010" stroke-width="0.5" fill="none" />
+    </pattern>
+    
+    <!-- Tea Cup Icon Pattern -->
+    <pattern id="cupPattern" patternUnits="userSpaceOnUse" width="120" height="120">
+      <g transform="scale(0.4)">
+        <path d="M30,40 Q30,20 60,20 Q90,20 90,40 L90,80 Q90,100 60,100 Q30,100 30,80 Z" 
+              fill="none" stroke="#688c5010" stroke-width="4"/>
+        <path d="M90,50 Q110,50 110,65 Q110,80 90,80" 
+              fill="none" stroke="#688c5010" stroke-width="4" stroke-linecap="round"/>
+      </g>
+    </pattern>
+    
+    <!-- Gradient Definition -->
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f5f9f2;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#eaf2e5;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Main Background -->
+  <rect width="100%" height="100%" fill="url(#bgGradient)" />
+  
+  <!-- Pattern Layers -->
+  <rect width="100%" height="100%" fill="url(#gridPattern)" />
+  <rect width="100%" height="100%" fill="url(#leafPattern)" opacity="0.7" />
+  <rect width="100%" height="100%" fill="url(#cupPattern)" opacity="0.5" />
+  
+  <!-- Decorative Corner Elements -->
+  <g opacity="0.2">
+    <!-- Top Left -->
+    <path d="M0,0 Q150,0 150,150" stroke="#688c50" stroke-width="3" fill="none" />
+    <path d="M0,0 Q100,0 100,100" stroke="#688c50" stroke-width="2" fill="none" />
+    <path d="M0,0 Q50,0 50,50" stroke="#688c50" stroke-width="1" fill="none" />
+    
+    <!-- Bottom Right -->
+    <path d="M800,800 Q650,800 650,650" stroke="#688c50" stroke-width="3" fill="none" />
+    <path d="M800,800 Q700,800 700,700" stroke="#688c50" stroke-width="2" fill="none" />
+    <path d="M800,800 Q750,800 750,750" stroke="#688c50" stroke-width="1" fill="none" />
+  </g>
+</svg> 

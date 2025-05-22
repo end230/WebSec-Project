@@ -1,0 +1,396 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/**
+ * Green Tea Design System
+ * A nature-inspired design system with elegant components
+ */
+
+/* ======================================================
+   BASE VARIABLES
+   ====================================================== */
+:root {
+  /* Primary palette */
+  --color-primary: #688c50;
+  --color-primary-light: #8aaa71;
+  --color-primary-dark: #4f703c;
+  
+  /* Neutral colors */
+  --color-background: #f3f7f0;
+  --color-surface: white;
+  --color-text: #2c3c25;
+  --color-text-muted: #3d5731;
+  --color-border: #d2e3c3;
+  
+  /* State colors */
+  --color-success: #28a745;
+  --color-danger: #dc3545;
+  --color-warning: #ffc107;
+  --color-info: #17a2b8;
+  
+  /* Effects */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+  
+  /* Transitions */
+  --transition-fast: 150ms ease-in-out;
+  --transition-normal: 300ms ease-in-out;
+}
+
+/* Dark theme variables */
+.dark {
+  --color-background: #2c3c25;
+  --color-surface: #34472b;
+  --color-text: #f3f7f0;
+  --color-text-muted: #d2e3c3;
+  --color-border: #3d5731;
+}
+
+/* ======================================================
+   CUSTOM COMPONENTS
+   ====================================================== */
+@layer components {
+  /**
+   * Card component
+   * A flexible container with subtle shadow and rounded corners
+   */
+  .nature-card {
+    @apply bg-white rounded-lg border border-greentea-200 shadow-md p-6 transition-all duration-300 dark:bg-gray-800 dark:border-gray-700;
+  }
+  
+  .nature-card:hover {
+    @apply shadow-lg -translate-y-1;
+  }
+  
+  /**
+   * Button components
+   * Primary and secondary action buttons with natural styling
+   */
+  .nature-btn {
+    @apply inline-flex items-center justify-center px-4 py-2
+    bg-greentea-500 text-white font-medium rounded-md
+    hover:bg-greentea-600 focus:outline-none focus:ring-2 focus:ring-greentea-400 focus:ring-offset-2
+    transition-colors duration-300;
+  }
+  
+  .nature-btn-outline {
+    @apply inline-flex items-center justify-center px-4 py-2
+    border border-greentea-500 text-greentea-500 font-medium rounded-md 
+    hover:bg-greentea-50 focus:outline-none focus:ring-2 focus:ring-greentea-400 focus:ring-offset-2
+    transition-colors duration-300 dark:hover:bg-gray-800;
+  }
+  
+  /**
+   * Form elements
+   * Thoughtfully styled inputs and form controls
+   */
+  .nature-input {
+    @apply block w-full px-3 py-2 bg-white border border-greentea-300 rounded-md
+    text-greentea-900 placeholder-greentea-400
+    focus:outline-none focus:ring-2 focus:ring-greentea-400 focus:border-transparent
+    transition duration-300 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700;
+  }
+  
+  /**
+   * Badge component
+   * Compact label for status and categories
+   */
+  .nature-badge {
+    @apply inline-block px-2 py-1 text-xs font-semibold rounded-full
+    bg-greentea-100 text-greentea-800 dark:bg-greentea-900 dark:text-greentea-100;
+  }
+  
+  /**
+   * Alert components
+   * Informational messages with contextual styling
+   */
+  .nature-alert {
+    @apply p-4 mb-4 rounded-md border-l-4;
+  }
+  
+  .nature-alert-success {
+    @apply bg-green-50 border-green-500 text-green-800 dark:bg-green-900/20 dark:text-green-300;
+  }
+  
+  .nature-alert-error {
+    @apply bg-red-50 border-red-500 text-red-800 dark:bg-red-900/20 dark:text-red-300;
+  }
+  
+  .nature-alert-warning {
+    @apply bg-yellow-50 border-yellow-500 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300;
+  }
+  
+  .nature-alert-info {
+    @apply bg-blue-50 border-blue-500 text-blue-800 dark:bg-blue-900/20 dark:text-blue-300;
+  }
+  
+  /**
+   * Navigation components
+   */
+  .nature-nav-link {
+    @apply inline-flex items-center px-3 py-2 rounded-md
+    text-greentea-700 hover:bg-greentea-50 hover:text-greentea-900
+    transition-colors duration-300
+    dark:text-greentea-400 dark:hover:bg-gray-800 dark:hover:text-greentea-300;
+  }
+  
+  .nature-nav-link-active {
+    @apply bg-greentea-500 text-white font-medium dark:bg-greentea-600;
+  }
+}
+
+/* ======================================================
+   UTILITIES
+   ====================================================== */
+@layer utilities {
+  .leaf-pattern-bg {
+    background-image: url('/images/leaf-pattern.svg');
+    background-repeat: repeat;
+    background-size: 200px;
+    opacity: 0.1;
+  }
+}
+
+/* ======================================================
+   CUSTOM SCROLLBAR - Non-Tailwind Styles
+   ====================================================== */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background-color: #f3f7f0;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #8aaa71;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #688c50;
+}
+
+/* ======================================================
+   FALLBACK CSS - When Tailwind processing fails
+   ====================================================== */
+/* Card Fallback */
+.nature-card-fallback {
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  border: 1px solid #d2e3c3;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.nature-card-fallback:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Button Fallbacks */
+.nature-btn-fallback {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 1rem;
+  background-color: #688c50;
+  color: white;
+  font-weight: 500;
+  border-radius: 0.375rem;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+.nature-btn-fallback:hover {
+  background-color: #4f703c;
+}
+
+.nature-btn-fallback:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(104, 140, 80, 0.3);
+}
+
+.nature-btn-outline-fallback {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 1rem;
+  background-color: transparent;
+  border: 1px solid #688c50;
+  color: #688c50;
+  font-weight: 500;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.nature-btn-outline-fallback:hover {
+  background-color: #f3f7f0;
+}
+
+.nature-btn-outline-fallback:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(104, 140, 80, 0.3);
+}
+
+/* Input Fallback */
+.nature-input-fallback {
+  display: block;
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #adc79a;
+  border-radius: 0.375rem;
+  background-color: white;
+  color: #2c3c25;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.nature-input-fallback:focus {
+  outline: none;
+  border-color: transparent;
+  box-shadow: 0 0 0 3px rgba(104, 140, 80, 0.3);
+}
+
+/* Badge Fallback */
+.nature-badge-fallback {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 9999px;
+  background-color: #e8f1e2;
+  color: #3d5731;
+}
+
+/* Alert Fallbacks */
+.nature-alert-fallback {
+  position: relative;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-radius: 0.375rem;
+  border-left: 4px solid transparent;
+}
+
+.nature-alert-success-fallback {
+  background-color: #d1e7dd;
+  border-left-color: #0f5132;
+  color: #0f5132;
+}
+
+.nature-alert-error-fallback {
+  background-color: #f8d7da;
+  border-left-color: #842029;
+  color: #842029;
+}
+
+.nature-alert-warning-fallback {
+  background-color: #fff3cd;
+  border-left-color: #664d03;
+  color: #664d03;
+}
+
+.nature-alert-info-fallback {
+  background-color: #cff4fc;
+  border-left-color: #055160;
+  color: #055160;
+}
+
+/* Navigation Fallbacks */
+.nature-nav-link-fallback {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.375rem;
+  color: #3d5731;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.nature-nav-link-fallback:hover {
+  background-color: #f3f7f0;
+  color: #2c3c25;
+}
+
+.nature-nav-link-active-fallback {
+  background-color: #e8f1e2;
+  color: #2c3c25;
+  font-weight: 500;
+}
+
+
+@keyframes fadeUpIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -468px 0;
+  }
+  100% {
+    background-position: 468px 0;
+  }
+}
+
+.product-shimmer-effect {
+  position: relative;
+  overflow: hidden;
+}
+
+.product-shimmer-effect::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  transform: translateX(-100%);
+  background-image: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0,
+    rgba(255, 255, 255, 0.2) 20%,
+    rgba(255, 255, 255, 0.5) 60%,
+    rgba(255, 255, 255, 0)
+  );
+  animation: shimmer 2s infinite;
+  pointer-events: none;
+}
+
+.tea-collection-card {
+  @apply relative overflow-hidden bg-white dark:bg-gray-800 rounded-lg shadow transition-all duration-300;
+}
+
+.tea-collection-card:hover {
+  @apply shadow-xl -translate-y-1;
+}
+
+.tea-image-hover {
+  @apply transition-transform duration-700 ease-in-out scale-100;
+}
+
+.tea-image-hover:hover {
+  @apply scale-110;
+}
+
+.price-badge {
+  @apply absolute top-4 right-4 bg-white dark:bg-gray-800 text-greentea-700 dark:text-greentea-400
+    font-bold px-3 py-1 rounded-full shadow
+    transform -rotate-3 transition-transform duration-300
+    flex items-center justify-center
+    before:content-['$']
+    before:text-xs before:mr-0.5 before:opacity-70;
+}
+
+.tea-collection-card:hover .price-badge {
+  @apply rotate-3 scale-110;
+}

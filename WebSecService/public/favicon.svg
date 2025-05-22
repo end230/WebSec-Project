@@ -1,0 +1,18 @@
+<svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+    <!-- Background Circle -->
+    <circle cx="16" cy="16" r="16" fill="#f3f7f0"/>
+    
+    <!-- Tea Cup -->
+    <path d="M8 12 Q8 7 16 7 Q24 7 24 12 L24 22 Q24 27 16 27 Q8 27 8 22 Z" fill="white" stroke="#688c50" stroke-width="1.5"/>
+    
+    <!-- Cup Handle -->
+    <path d="M24 14 Q28 14 28 17 Q28 20 24 20" fill="none" stroke="#688c50" stroke-width="1.5" stroke-linecap="round"/>
+    
+    <!-- Tea Leaf -->
+    <path d="M16 12 Q18 10 17.5 14 Q21 12 19 16 Q22 15 19 18 Q21 20 16 19 Q14 21 14 18 Q11 19 13 16 Q10 16 12.5 14 Q11 12 13.5 13 Q13 10 16 12" fill="#688c50"/>
+    
+    <!-- Steam -->
+    <path d="M13 5 Q14 4 13.5 3" fill="none" stroke="#688c50" stroke-width="0.8" stroke-linecap="round"/>
+    <path d="M16 5 Q17 3 16.5 2" fill="none" stroke="#688c50" stroke-width="0.8" stroke-linecap="round"/>
+    <path d="M19 5 Q20 4 19.5 3" fill="none" stroke="#688c50" stroke-width="0.8" stroke-linecap="round"/>
+</svg> 
