@@ -18,8 +18,6 @@ use Laravel\Socialite\Facades\Socialite;
 use Illuminate\Support\Str; // Add this import for Str class
 use Illuminate\Support\Facades\Schema; // Add missing import for Schema
 use Illuminate\Support\Facades\Log; // Add missing import for Log
-use Illuminate\Support\Facades\Password as FacadesPassword;
-use Illuminate\Auth\Events\PasswordReset;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
@@ -30,8 +28,7 @@ class UsersController extends Controller {
 	use ValidatesRequests;
 
     public function list(Request $request) {
-        // Allow both users with show_users permission and Editors to view the user list
-        if (!auth()->user()->hasPermissionTo('show_users') && !auth()->user()->hasRole('Editor')) {
+        if (!auth()->user()->hasPermissionTo('show_users')) {
             abort(403, 'You do not have permission to view users.');
         }
         
@@ -142,7 +139,59 @@ class UsersController extends Controller {
     }
 
     public function login(Request $request) {
+        // Check if user is already authenticated via SSL certificate
+        if (Auth::check()) {
+            return redirect('/')->with('success', 'You are already logged in via SSL certificate.');
+        }
+        
+        // Check for SSL certificate and attempt automatic login
+        if ($this->attemptSSLCertificateLogin($request)) {
+            return redirect('/')->with('success', 'Successfully logged in with SSL certificate.');
+        }
+        
         return view('users.login');
+    }
+
+    /**
+     * Attempt to login using SSL certificate information
+     */
+    private function attemptSSLCertificateLogin(Request $request): bool
+    {
+        if ($request->server('SSL_CLIENT_VERIFY') !== 'SUCCESS') {
+            return false;
+        }
+
+        $clientEmail = $request->server('SSL_CLIENT_S_DN_Email');
+        $clientCN = $request->server('SSL_CLIENT_S_DN_CN');
+        $clientSerial = $request->server('SSL_CLIENT_M_SERIAL');
+
+        // Try to find user by email first
+        $user = null;
+        if ($clientEmail) {
+            $user = User::where('email', $clientEmail)->first();
+        }
+
+        // If not found by email, try by certificate CN
+        if (!$user && $clientCN) {
+            $user = User::where('certificate_cn', $clientCN)->first();
+        }
+
+        // If not found by CN, try by certificate serial
+        if (!$user && $clientSerial) {
+            $user = User::where('certificate_serial', $clientSerial)->first();
+        }
+
+        if ($user) {
+            Auth::login($user);
+            Log::info('User logged in via SSL certificate in login controller', [
+                'user_id' => $user->id,
+                'certificate_email' => $clientEmail,
+                'certificate_cn' => $clientCN
+            ]);
+            return true;
+        }
+
+        return false;
     }
 
     public function doLogin(Request $request) {
@@ -192,17 +241,9 @@ class UsersController extends Controller {
     public function edit(Request $request, ?User $user = null) {
         $user = $user ?? auth()->user();
         
-        // If the user is trying to edit someone else's profile
+        // Fixed permission check - using edit_users instead of show_users
         if(auth()->id() != $user?->id) {
-            // Editors can view but not edit other users
-            if(auth()->user()->hasRole('Editor') && !auth()->user()->hasPermissionTo('edit_users')) {
-                abort(403, 'As an Editor, you can view users but not edit them.');
-            }
-            
-            // Others need the edit_users permission
-            if(!auth()->user()->hasPermissionTo('edit_users')) {
-                abort(403, 'You do not have permission to edit users.');
-            }
+            if(!auth()->user()->hasPermissionTo('edit_users')) abort(403);
         }
 
         $roles = [];
@@ -217,11 +258,8 @@ class UsersController extends Controller {
             $permission->taken = in_array($permission->id, $directPermissionsIds);
             $permissions[] = $permission;
         }
-        
-        // Set a flag for read-only view for Editors
-        $isReadOnly = auth()->user()->hasRole('Editor') && !auth()->user()->hasPermissionTo('edit_users');
-        
-        return view('users.edit', compact('user', 'roles', 'permissions', 'isReadOnly'));
+
+        return view('users.edit', compact('user', 'roles', 'permissions'));
     }
 
     public function save(Request $request, User $user) {
@@ -238,15 +276,6 @@ class UsersController extends Controller {
         $user->save();
 
         if(auth()->user()->hasPermissionTo('admin_users')) {
-            // Check if user is trying to assign Admin role
-            if (!$user->hasRole('Admin') && in_array('Admin', $request->roles ?? [])) {
-                // Only Editors can assign Admin role
-                if (!auth()->user()->hasRole('Editor')) {
-                    return redirect()->route('users_edit', $user->id)
-                        ->with('error', 'Only users with Editor role can assign Admin role.');
-                }
-            }
-            
             // Prevent removing Admin role from self or last admin
             if (auth()->id() == $user->id && $user->hasRole('Admin')) {
                 $hasAdminRole = false;
@@ -715,115 +744,41 @@ class UsersController extends Controller {
     }
 
     /**
-     * Show the form for requesting a password reset link.
+     * Show SSL certificate management form for a user
      */
-    public function showForgotPasswordForm()
+    public function manageCertificate(User $user)
     {
-        return view('users.forgot-password');
-    }
-
-    /**
-     * Send a password reset link to the given user.
-     */
-    public function sendResetLinkEmail(Request $request)
-    {
-        $request->validate(['email' => 'required|email']);
-
-        // Create a password reset token
-        $token = Str::random(64);
-        
-        // Delete any existing tokens for this user
-        DBFacade::table('password_resets')->where('email', $request->email)->delete();
-        
-        // Insert new token
-        DBFacade::table('password_resets')->insert([
-            'email' => $request->email,
-            'token' => $token,
-            'created_at' => Carbon::now()
-        ]);
-        
-        // Get the user
-        $user = User::where('email', $request->email)->first();
-        
-        if (!$user) {
-            // Don't reveal that the user doesn't exist
-            return back()->with('status', 'We have emailed your password reset link!');
+        // Check if user has permission to manage certificates
+        if (!Auth::user()->hasPermissionTo('edit_users') && Auth::id() !== $user->id) {
+            abort(403, 'Unauthorized action. You need edit_users permission.');
         }
-        
-        // Create reset URL
-        $resetUrl = route('password.reset', ['token' => $token]);
-        
-        // Send the password reset email
-        try {
-            Mail::send(
-                ['html' => 'emails.password-reset', 'text' => 'emails.password-reset-plain'],
-                ['resetUrl' => $resetUrl, 'user' => $user],
-                function($message) use ($user) {
-                    $message->to($user->email);
-                    $message->subject('Reset Your Password');
-                }
-            );
-            
-            Log::info("Password reset email sent to: {$user->email}");
-            return back()->with('status', 'We have emailed your password reset link!');
-        } catch (\Exception $e) {
-            Log::error("Failed to send password reset email: " . $e->getMessage());
-            return back()->withErrors(['email' => 'Could not send reset link. Please try again later.']);
+
+        return view('users.manage_certificate', compact('user'));
+    }
+
+    /**
+     * Save SSL certificate information for a user
+     */
+    public function saveCertificate(Request $request, User $user)
+    {
+        // Check if user has permission to manage certificates
+        if (!Auth::user()->hasPermissionTo('edit_users') && Auth::id() !== $user->id) {
+            abort(403, 'Unauthorized action. You need edit_users permission.');
         }
-    }
 
-    /**
-     * Display the password reset view for the given token.
-     */
-    public function showResetForm(Request $request, $token)
-    {
-        return view('users.reset-password', ['token' => $token]);
-    }
-
-    /**
-     * Reset the given user's password.
-     */
-    public function resetPassword(Request $request)
-    {
         $request->validate([
-            'token' => 'required',
-            'email' => 'required|email',
-            'password' => ['required', 'confirmed', Password::min(8)->numbers()->letters()->mixedCase()->symbols()],
+            'certificate_cn' => 'nullable|string|max:255',
+            'certificate_serial' => 'nullable|string|max:255',
+            'certificate_dn' => 'nullable|string|max:1000',
         ]);
 
-        // Check if token exists and is valid
-        $passwordReset = DBFacade::table('password_resets')
-            ->where('email', $request->email)
-            ->where('token', $request->token)
-            ->first();
-            
-        if (!$passwordReset) {
-            return back()->withErrors(['email' => 'Invalid or expired token.']);
-        }
-        
-        // Check if token is expired (tokens valid for 60 minutes)
-        if (Carbon::parse($passwordReset->created_at)->addMinutes(60)->isPast()) {
-            DBFacade::table('password_resets')->where('email', $request->email)->delete();
-            return back()->withErrors(['email' => 'Password reset token has expired.']);
-        }
+        $user->update([
+            'certificate_cn' => $request->certificate_cn,
+            'certificate_serial' => $request->certificate_serial,
+            'certificate_dn' => $request->certificate_dn,
+        ]);
 
-        // Find the user
-        $user = User::where('email', $request->email)->first();
-        
-        if (!$user) {
-            return back()->withErrors(['email' => 'We cannot find a user with that email address.']);
-        }
-
-        // Update the password
-        $user->password = Hash::make($request->password);
-        $user->save();
-        
-        // Delete the token
-        DBFacade::table('password_resets')->where('email', $request->email)->delete();
-        
-        // Log the user in
-        Auth::login($user);
-        
-        return redirect('/')->with('status', 'Your password has been reset!');
+        return redirect()->route('users.certificate', $user)
+            ->with('success', 'SSL certificate information updated successfully.');
     }
 }
