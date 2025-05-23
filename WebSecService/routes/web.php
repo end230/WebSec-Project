@@ -1,6 +1,7 @@
 <?php
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Web\ProductsController;
 use App\Http\Controllers\Web\UsersController;
 use App\Http\Controllers\Web\OrdersController;
@@ -18,6 +19,12 @@ Route::get('login', [UsersController::class, 'login'])->name('login');
 Route::post('login', [UsersController::class, 'doLogin'])->name('do_login')->middleware('rate.login');
 Route::get('logout', [UsersController::class, 'doLogout'])->name('do_logout');
 
+// Password Reset Routes
+Route::get('forgot-password', [UsersController::class, 'showForgotPasswordForm'])->name('password.request');
+Route::post('forgot-password', [UsersController::class, 'sendResetLinkEmail'])->name('password.email');
+Route::get('reset-password/{token}', [UsersController::class, 'showResetForm'])->name('password.reset');
+Route::post('reset-password', [UsersController::class, 'resetPassword'])->name('password.update');
+
 // SSL Certificate debug route
 
 Route::get('cert-info', function (Request $request) {
@@ -28,7 +35,7 @@ Route::get('cert-info', function (Request $request) {
         'SSL_CLIENT_S_DN' => $request->server('SSL_CLIENT_S_DN'),
         'SSL_CLIENT_M_SERIAL' => $request->server('SSL_CLIENT_M_SERIAL'),
         'SSL_CLIENT_CERT' => $request->server('SSL_CLIENT_CERT') ? 'Present' : 'Not Present',
-        'Auth Status' => auth()->check() ? 'Logged in as: ' . auth()->user()->email : 'Not logged in',
+        'Auth Status' => Auth::check() ? 'Logged in as: ' . Auth::user()->email : 'Not logged in',
         'All SSL Variables' => collect($_SERVER)->filter(function($value, $key) {
             return strpos($key, 'SSL_') === 0;
         })->toArray()
@@ -159,7 +166,7 @@ Route::get('/', function (Request $request) {
     if ($clientVerify === 'SUCCESS' && ($clientEmail || $clientSerial)) {
         // The SSLCertificateAuth middleware will handle the authentication
         // We just need to wait a moment for it to complete
-        if (!auth()->check()) {
+        if (!Auth::check()) {
             // Find the user
             $user = null;
             if ($clientEmail) {
@@ -171,12 +178,12 @@ Route::get('/', function (Request $request) {
             
             // If we found a user, log them in
             if ($user) {
-                auth()->login($user);
+                Auth::login($user);
             }
         }
         
         // If successfully authenticated, redirect to products
-        if (auth()->check()) {
+        if (Auth::check()) {
             return redirect()->route('products_list');
         }
     }
@@ -231,7 +238,7 @@ Route::middleware(['auth', 'permission:view_customer_feedback|respond_to_feedbac
 
 // Add notification route
 Route::get('/notifications/mark-as-read', function() {
-    auth()->user()->unreadNotifications->markAsRead();
+    Auth::user()->unreadNotifications->markAsRead();
     return redirect()->back()->with('success', 'All notifications marked as read');
 })->middleware(['auth'])->name('notifications.markAsRead');
 
