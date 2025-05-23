@@ -6,7 +6,7 @@
 <div class="container py-4">
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{{ route('home') }}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{{ url('/') }}">Home</a></li>
             <li class="breadcrumb-item"><a href="{{ route('products_list') }}">Products</a></li>
             <li class="breadcrumb-item active" aria-current="page">{{ $product->name }}</li>
         </ol>
@@ -33,6 +33,25 @@
                 </div>
                 <div class="card-body">
                     <h3 class="text-primary mb-4">${{ number_format($product->price, 2) }}</h3>
+                    
+                    <!-- Rating Summary -->
+                    @if($product->getReviewCount() > 0)
+                        <div class="mb-4">
+                            <div class="d-flex align-items-center">
+                                @for($i = 1; $i <= 5; $i++)
+                                    @if($i <= round($product->getAverageRating()))
+                                        <i class="bi bi-star-fill text-warning"></i>
+                                    @else
+                                        <i class="bi bi-star text-muted"></i>
+                                    @endif
+                                @endfor
+                                <span class="ms-2">
+                                    {{ number_format($product->getAverageRating(), 1) }} out of 5 
+                                    ({{ $product->getReviewCount() }} {{ $product->getReviewCount() === 1 ? 'review' : 'reviews' }})
+                                </span>
+                            </div>
+                        </div>
+                    @endif
                     
                     <div class="mb-4">
                         <h5>Description</h5>
@@ -85,7 +104,296 @@
             </div>
         </div>
     </div>
+
+    <!-- Reviews Section -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0">
+                        <i class="bi bi-chat-left-text me-2"></i>Customer Reviews
+                        @if($product->getReviewCount() > 0)
+                            <span class="badge bg-primary ms-2">{{ $product->getReviewCount() }}</span>
+                        @endif
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <!-- Review Form -->
+                    @auth
+                        @if($hasPurchased && !$existingComment)
+                            <!-- User has purchased and can review -->
+                            <div class="alert alert-info mb-4">
+                                <i class="bi bi-info-circle me-2"></i>
+                                You've purchased this product! Share your experience to help other customers.
+                            </div>
+                            
+                            <form action="{{ route('products.comments.store', $product) }}" method="POST" class="mb-4">
+                                @csrf
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">Write a Review</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <!-- Rating -->
+                                        <div class="mb-3">
+                                            <label class="form-label">Rating *</label>
+                                            <div class="rating-input">
+                                                @for($i = 5; $i >= 1; $i--)
+                                                    <input type="radio" name="rating" value="{{ $i }}" id="star{{ $i }}" required>
+                                                    <label for="star{{ $i }}" class="star">
+                                                        <i class="bi bi-star-fill"></i>
+                                                    </label>
+                                                @endfor
+                                            </div>
+                                            @error('rating')
+                                                <div class="text-danger small">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                        
+                                        <!-- Comment -->
+                                        <div class="mb-3">
+                                            <label for="comment" class="form-label">Your Review *</label>
+                                            <textarea name="comment" id="comment" class="form-control" rows="4" 
+                                                placeholder="Share your experience with this product..." 
+                                                maxlength="1000" required>{{ old('comment') }}</textarea>
+                                            @error('comment')
+                                                <div class="text-danger small">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                        
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="bi bi-send me-1"></i>Submit Review
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        @elseif($existingComment)
+                            <!-- User has already reviewed -->
+                            <div class="alert alert-success mb-4">
+                                <i class="bi bi-check-circle me-2"></i>
+                                Thank you! You have already reviewed this product.
+                            </div>
+                            
+                            <!-- Show disabled form with their existing review -->
+                            <div class="card mb-4">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Your Review</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <label class="form-label">Your Rating</label>
+                                        <div class="d-flex align-items-center">
+                                            @for($i = 1; $i <= 5; $i++)
+                                                @if($i <= $existingComment->rating)
+                                                    <i class="bi bi-star-fill text-warning"></i>
+                                                @else
+                                                    <i class="bi bi-star text-muted"></i>
+                                                @endif
+                                            @endfor
+                                            <span class="ms-2 fw-bold">{{ $existingComment->rating }}/5</span>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Your Review</label>
+                                        <div class="p-3 bg-light rounded">
+                                            {{ $existingComment->comment }}
+                                        </div>
+                                    </div>
+                                    <small class="text-muted">
+                                        Reviewed on {{ $existingComment->created_at->format('M d, Y') }}
+                                    </small>
+                                </div>
+                            </div>
+                        @elseif(!$hasPurchased)
+                            <!-- User hasn't purchased - show disabled form with message -->
+                            <div class="alert alert-warning mb-4">
+                                <i class="bi bi-exclamation-triangle me-2"></i>
+                                You can only review products you have purchased and received.
+                            </div>
+                            
+                            <div class="card mb-4 opacity-75">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Write a Review</h5>
+                                </div>
+                                <div class="card-body">
+                                    <!-- Disabled Rating -->
+                                    <div class="mb-3">
+                                        <label class="form-label">Rating *</label>
+                                        <div class="rating-input-disabled">
+                                            @for($i = 5; $i >= 1; $i--)
+                                                <span class="star-disabled">
+                                                    <i class="bi bi-star text-muted"></i>
+                                                </span>
+                                            @endfor
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Disabled Comment -->
+                                    <div class="mb-3">
+                                        <label for="comment-disabled" class="form-label">Your Review *</label>
+                                        <textarea id="comment-disabled" class="form-control" rows="4" 
+                                            placeholder="Purchase this product to leave a review..." 
+                                            disabled readonly></textarea>
+                                    </div>
+                                    
+                                    <button type="button" class="btn btn-secondary" disabled>
+                                        <i class="bi bi-lock me-1"></i>Purchase Required to Review
+                                    </button>
+                                </div>
+                            </div>
+                        @endif
+                    @else
+                        <!-- Guest user - show disabled form with login prompt -->
+                        <div class="alert alert-info mb-4">
+                            <i class="bi bi-info-circle me-2"></i>
+                            <a href="{{ route('login') }}">Sign in</a> to write a review for this product.
+                        </div>
+                        
+                        <div class="card mb-4 opacity-75">
+                            <div class="card-header">
+                                <h5 class="mb-0">Write a Review</h5>
+                            </div>
+                            <div class="card-body">
+                                <!-- Disabled Rating -->
+                                <div class="mb-3">
+                                    <label class="form-label">Rating *</label>
+                                    <div class="rating-input-disabled">
+                                        @for($i = 5; $i >= 1; $i--)
+                                            <span class="star-disabled">
+                                                <i class="bi bi-star text-muted"></i>
+                                            </span>
+                                        @endfor
+                                    </div>
+                                </div>
+                                
+                                <!-- Disabled Comment -->
+                                <div class="mb-3">
+                                    <label for="comment-guest" class="form-label">Your Review *</label>
+                                    <textarea id="comment-guest" class="form-control" rows="4" 
+                                        placeholder="Sign in to leave a review..." 
+                                        disabled readonly></textarea>
+                                </div>
+                                
+                                <a href="{{ route('login') }}" class="btn btn-primary">
+                                    <i class="bi bi-box-arrow-in-right me-1"></i>Sign In to Review
+                                </a>
+                            </div>
+                        </div>
+                    @endauth
+                    
+                    <!-- Existing Reviews -->
+                    @if($comments->count() > 0)
+                        <h5 class="mb-3">Customer Reviews</h5>
+                        @foreach($comments as $comment)
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <div>
+                                            <h6 class="mb-1">{{ $comment->user->name }}</h6>
+                                            <div class="d-flex align-items-center mb-2">
+                                                @for($i = 1; $i <= 5; $i++)
+                                                    @if($i <= $comment->rating)
+                                                        <i class="bi bi-star-fill text-warning"></i>
+                                                    @else
+                                                        <i class="bi bi-star text-muted"></i>
+                                                    @endif
+                                                @endfor
+                                                <span class="ms-2 fw-bold">{{ $comment->rating }}/5</span>
+                                                @if($comment->is_verified_purchase)
+                                                    <span class="badge bg-success ms-2">Verified Purchase</span>
+                                                @endif
+                                            </div>
+                                        </div>
+                                        <small class="text-muted">{{ $comment->created_at->diffForHumans() }}</small>
+                                    </div>
+                                    <p class="mb-0">{{ $comment->comment }}</p>
+                                </div>
+                            </div>
+                        @endforeach
+                        
+                        <!-- Pagination -->
+                        @if($comments->hasPages())
+                            <div class="d-flex justify-content-center">
+                                {{ $comments->links() }}
+                            </div>
+                        @endif
+                    @else
+                        <div class="text-center py-4">
+                            <i class="bi bi-chat-left-text text-muted" style="font-size: 3rem;"></i>
+                            <h5 class="text-muted mt-3">No reviews yet</h5>
+                            <p class="text-muted">Be the first to review this product!</p>
+                        </div>
+                    @endif
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+<style>
+.rating-input {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+}
+
+.rating-input input[type="radio"] {
+    display: none;
+}
+
+.rating-input label.star {
+    font-size: 1.5rem;
+    color: #ddd;
+    cursor: pointer;
+    margin: 0 2px;
+    transition: color 0.3s;
+}
+
+.rating-input label.star:hover,
+.rating-input label.star:hover ~ label.star,
+.rating-input input[type="radio"]:checked ~ label.star {
+    color: #ffc107;
+}
+
+/* Disabled rating styles */
+.rating-input-disabled {
+    display: flex;
+    justify-content: flex-start;
+}
+
+.rating-input-disabled .star-disabled {
+    font-size: 1.5rem;
+    margin: 0 2px;
+    cursor: not-allowed;
+}
+
+.rating-input-disabled .star-disabled i {
+    color: #dee2e6 !important;
+}
+
+/* Disabled card styles */
+.card.opacity-75 {
+    position: relative;
+}
+
+.card.opacity-75::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.7);
+    z-index: 1;
+    border-radius: 0.375rem;
+    pointer-events: none;
+}
+
+.card.opacity-75 .card-body {
+    position: relative;
+    z-index: 2;
+}
+</style>
 @endsection
 
 @section('scripts')
