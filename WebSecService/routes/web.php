@@ -1,6 +1,8 @@
 <?php
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
+use App\Models\User;
 use App\Http\Controllers\Web\ProductsController;
 use App\Http\Controllers\Web\UsersController;
 use App\Http\Controllers\Web\OrdersController;
@@ -123,6 +125,13 @@ Route::middleware(['auth'])->group(function () {
 
 // Basic pages
 Route::get('/', function () {
+    $clientEmail = request()->server('SSL_CLIENT_S_DN_Email');
+    if ($clientEmail && !auth()->check()) {
+        $user = User::where('email', $clientEmail)->first();
+        if ($user) {
+            Auth::login($user);
+        }
+    }
     return view('welcome');
 });
 
@@ -186,3 +195,4 @@ Route::post('/save-theme-preferences', [App\Http\Controllers\Web\UsersController
     
 // Verify email route
 Route::get('verify', [UsersController::class, 'verify'])->name('verify');
+
