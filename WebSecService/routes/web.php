@@ -221,7 +221,6 @@ Route::middleware(['auth', 'permission:manage_roles_permissions|assign_admin_rol
         ->name('admin-management.create');
     Route::post('/admin-management', [AdminManagementController::class, 'store'])
         ->name('admin-management.store');
-<<<<<<< HEAD
     Route::get('/admin-management/{admin}/edit', [AdminManagementController::class, 'edit'])
         ->name('admin-management.edit');
     Route::put('/admin-management/{admin}', [AdminManagementController::class, 'update'])
@@ -233,7 +232,4 @@ Route::middleware(['auth', 'role:Editor'])->group(function () {
     Route::post('/admin-management/{admin}/toggle-editor-permissions', [AdminManagementController::class, 'toggleEditorPermissions'])
         ->name('admin-management.toggle-editor-permissions');
 });
-=======
-});
 
->>>>>>> origin/main
