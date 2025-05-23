@@ -34,7 +34,7 @@
                                 <td>{{ $feedback->id }}</td>
                                 <td><a href="{{ route('orders.show', $feedback->order_id) }}" class="text-decoration-none">#{{ $feedback->order_id }}</a></td>
                                 <td>{{ $feedback->user->name }}</td>
-                                <td>{{ Str::limit($feedback->reason, 30) }}</td>
+                                <td>{{ str($feedback->reason)->limit(30) }}</td>
                                 <td>{{ $feedback->created_at->format('M d, Y') }}</td>
                                 <td>
                                     @if($feedback->resolved)
