@@ -9,6 +9,7 @@ use App\Http\Controllers\Web\OrdersController;
 use App\Http\Controllers\Web\FeedbackController;
 use App\Http\Controllers\Web\RolesController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\AdminManagementController;
 
 // Auth routes
 Route::get('register', [UsersController::class, 'register'])->name('register');
@@ -195,4 +196,14 @@ Route::post('/save-theme-preferences', [App\Http\Controllers\Web\UsersController
     
 // Verify email route
 Route::get('verify', [UsersController::class, 'verify'])->name('verify');
+
+// Admin Management Routes
+Route::middleware(['auth', 'role:Editor'])->group(function () {
+    Route::get('/admin-management', [AdminManagementController::class, 'index'])
+        ->name('admin-management.index');
+    Route::get('/admin-management/create', [AdminManagementController::class, 'create'])
+        ->name('admin-management.create');
+    Route::post('/admin-management', [AdminManagementController::class, 'store'])
+        ->name('admin-management.store');
+});
 

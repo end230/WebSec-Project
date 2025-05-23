@@ -32,8 +32,17 @@
                 <i class="fas fa-user-tag"></i> Manage Roles
               </a>
             </li>
+            <!-- Editor Links -->
           @endif
 
+          @if(auth()->user()->hasRole('Editor'))
+          <li class="nav-item">
+            <a class="nav-link d-flex align-items-center" href="{{ route('admin-management.index') }}">
+              <i class="fas fa-user-shield"></i> Manage Admins
+            </a>
+          </li>
+          @endif
+        
           <!-- Employee Links -->
           @if(auth()->user()->hasPermissionTo('view_customer_feedback'))
             <li class="nav-item dropdown">
