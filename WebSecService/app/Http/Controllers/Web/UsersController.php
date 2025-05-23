@@ -30,7 +30,8 @@ class UsersController extends Controller {
 	use ValidatesRequests;
 
     public function list(Request $request) {
-        if (!auth()->user()->hasPermissionTo('show_users')) {
+        // Allow both users with show_users permission and Editors to view the user list
+        if (!auth()->user()->hasPermissionTo('show_users') && !auth()->user()->hasRole('Editor')) {
             abort(403, 'You do not have permission to view users.');
         }
         
@@ -191,9 +192,17 @@ class UsersController extends Controller {
     public function edit(Request $request, ?User $user = null) {
         $user = $user ?? auth()->user();
         
-        // Fixed permission check - using edit_users instead of show_users
+        // If the user is trying to edit someone else's profile
         if(auth()->id() != $user?->id) {
-            if(!auth()->user()->hasPermissionTo('edit_users')) abort(403);
+            // Editors can view but not edit other users
+            if(auth()->user()->hasRole('Editor') && !auth()->user()->hasPermissionTo('edit_users')) {
+                abort(403, 'As an Editor, you can view users but not edit them.');
+            }
+            
+            // Others need the edit_users permission
+            if(!auth()->user()->hasPermissionTo('edit_users')) {
+                abort(403, 'You do not have permission to edit users.');
+            }
         }
 
         $roles = [];
@@ -208,8 +217,11 @@ class UsersController extends Controller {
             $permission->taken = in_array($permission->id, $directPermissionsIds);
             $permissions[] = $permission;
         }
-
-        return view('users.edit', compact('user', 'roles', 'permissions'));
+        
+        // Set a flag for read-only view for Editors
+        $isReadOnly = auth()->user()->hasRole('Editor') && !auth()->user()->hasPermissionTo('edit_users');
+        
+        return view('users.edit', compact('user', 'roles', 'permissions', 'isReadOnly'));
     }
 
     public function save(Request $request, User $user) {
@@ -226,6 +238,15 @@ class UsersController extends Controller {
         $user->save();
 
         if(auth()->user()->hasPermissionTo('admin_users')) {
+            // Check if user is trying to assign Admin role
+            if (!$user->hasRole('Admin') && in_array('Admin', $request->roles ?? [])) {
+                // Only Editors can assign Admin role
+                if (!auth()->user()->hasRole('Editor')) {
+                    return redirect()->route('users_edit', $user->id)
+                        ->with('error', 'Only users with Editor role can assign Admin role.');
+                }
+            }
+            
             // Prevent removing Admin role from self or last admin
             if (auth()->id() == $user->id && $user->hasRole('Admin')) {
                 $hasAdminRole = false;
