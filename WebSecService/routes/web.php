@@ -7,6 +7,9 @@ use App\Http\Controllers\Web\OrdersController;
 use App\Http\Controllers\Web\FeedbackController;
 use App\Http\Controllers\Web\RolesController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\AdminManagementController;
+use App\Http\Controllers\ProductCommentController;
+use App\Http\Controllers\CustomerServiceController;
 
 // Auth routes
 Route::get('register', [UsersController::class, 'register'])->name('register');
@@ -242,3 +245,65 @@ Route::post('/save-theme-preferences', [App\Http\Controllers\Web\UsersController
     
 // Verify email route
 Route::get('verify', [UsersController::class, 'verify'])->name('verify');
+
+// Admin Management Routes
+Route::middleware(['auth', 'permission:manage_roles_permissions|assign_admin_role'])->group(function () {
+    Route::get('/admin-management', [AdminManagementController::class, 'index'])
+        ->name('admin-management.index');
+    Route::get('/admin-management/create', [AdminManagementController::class, 'create'])
+        ->name('admin-management.create');
+    Route::post('/admin-management', [AdminManagementController::class, 'store'])
+        ->name('admin-management.store');
+    Route::get('/admin-management/{admin}/edit', [AdminManagementController::class, 'edit'])
+        ->name('admin-management.edit');
+    Route::put('/admin-management/{admin}', [AdminManagementController::class, 'update'])
+        ->name('admin-management.update');
+});
+
+// Editor Permission Toggle - Only Editors can access this
+Route::middleware(['auth', 'role:Editor'])->group(function () {
+    Route::post('/admin-management/{admin}/toggle-editor-permissions', [AdminManagementController::class, 'toggleEditorPermissions'])
+        ->name('admin-management.toggle-editor-permissions');
+});
+
+// Product Comments Routes
+Route::middleware(['auth'])->group(function () {
+    Route::post('/products/{product}/comments', [App\Http\Controllers\ProductCommentController::class, 'store'])
+        ->name('products.comments.store');
+});
+
+// Comment Management Routes (for moderation)
+Route::middleware(['auth', 'permission:view_customer_feedback'])->group(function () {
+    Route::get('/comments', [App\Http\Controllers\ProductCommentController::class, 'index'])
+        ->name('comments.index');
+    Route::get('/comments/{comment}', [App\Http\Controllers\ProductCommentController::class, 'show'])
+        ->name('comments.show');
+    Route::patch('/comments/{comment}/approval', [App\Http\Controllers\ProductCommentController::class, 'updateApproval'])
+        ->name('comments.approval');
+    Route::delete('/comments/{comment}', [App\Http\Controllers\ProductCommentController::class, 'destroy'])
+        ->name('comments.destroy');
+});
+
+// Customer Service Routes
+Route::middleware(['auth', 'permission:view_customer_feedback'])->group(function () {
+    Route::get('/customer-service/dashboard', [App\Http\Controllers\CustomerServiceController::class, 'dashboard'])
+        ->name('customer-service.dashboard');
+    Route::get('/customer-service/cases', [App\Http\Controllers\CustomerServiceController::class, 'index'])
+        ->name('customer-service.index');
+    Route::get('/customer-service/cases/{case}', [App\Http\Controllers\CustomerServiceController::class, 'show'])
+        ->name('customer-service.show');
+    Route::post('/customer-service/cases/{case}/assign', [App\Http\Controllers\CustomerServiceController::class, 'assign'])
+        ->name('customer-service.assign');
+    Route::patch('/customer-service/cases/{case}/status', [App\Http\Controllers\CustomerServiceController::class, 'updateStatus'])
+        ->name('customer-service.status');
+    Route::patch('/customer-service/cases/{case}/priority', [App\Http\Controllers\CustomerServiceController::class, 'updatePriority'])
+        ->name('customer-service.priority');
+    Route::post('/customer-service/cases/{case}/comment', [App\Http\Controllers\CustomerServiceController::class, 'addComment'])
+        ->name('customer-service.comment');
+    Route::post('/customer-service/cases/{case}/note', [App\Http\Controllers\CustomerServiceController::class, 'addInternalNote'])
+        ->name('customer-service.note');
+    Route::post('/customer-service/cases/{case}/resolve', [App\Http\Controllers\CustomerServiceController::class, 'resolve'])
+        ->name('customer-service.resolve');
+    Route::get('/customer-service/analytics', [App\Http\Controllers\CustomerServiceController::class, 'analytics'])
+        ->name('customer-service.analytics');
+});

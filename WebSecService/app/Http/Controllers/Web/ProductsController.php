@@ -18,7 +18,7 @@ class ProductsController extends Controller {
     }
 
 	public function list(Request $request) {
-		$query = Product::query();
+		$query = Product::with(['comments.user']); // Load comments with users
 		
 		// Apply search and filter logic
 		if ($request->filled('search')) {
@@ -59,7 +59,33 @@ class ProductsController extends Controller {
 		
 		$products = $query->paginate(12)->withQueryString();
 		
-		return view('products.list', compact('products'));
+		// For each product, check if current user has purchased it
+		$userPurchases = [];
+		$userComments = [];
+		
+		if (auth()->check()) {
+			// Get all products the user has purchased and received
+			$purchasedProductIds = \App\Models\Order::where('user_id', auth()->id())
+				->where('status', 'delivered')
+				->with('items')
+				->get()
+				->pluck('items')
+				->flatten()
+				->pluck('product_id')
+				->unique()
+				->toArray();
+			
+			$userPurchases = array_flip($purchasedProductIds);
+			
+			// Get user's existing comments for these products
+			$userComments = \App\Models\ProductComment::where('user_id', auth()->id())
+				->whereIn('product_id', $products->pluck('id'))
+				->pluck('product_id')
+				->flip()
+				->toArray();
+		}
+		
+		return view('products.list', compact('products', 'userPurchases', 'userComments'));
 	}
 
 	public function edit(Request $request, Product $product = null) {
@@ -152,8 +178,29 @@ class ProductsController extends Controller {
 	 */
 	public function show(Product $product)
 	{
+		// Load approved comments with user information
+		$comments = $product->comments()->with('user')->paginate(5);
+		
+		// Check if current user has purchased this product
+		$hasPurchased = false;
+		$existingComment = null;
+		
+		if (auth()->check()) {
+			// Check if user has completed order with this product
+			$hasPurchased = \App\Models\Order::where('user_id', auth()->id())
+				->whereHas('items', function($query) use ($product) {
+					$query->where('product_id', $product->id);
+				})
+				->where('status', 'delivered')
+				->exists();
+			
+			// Check if user has already reviewed this product
+			$existingComment = \App\Models\ProductComment::where('product_id', $product->id)
+				->where('user_id', auth()->id())
+				->first();
+		}
+		
 		$relatedProducts = Product::where('id', '!=', $product->id)
-			->where('category', $product->category)
 			->inRandomOrder()
 			->limit(4)
 			->get();
@@ -164,6 +211,6 @@ class ProductsController extends Controller {
 			$viewToken = md5(auth()->id() . '_' . $product->id . '_' . time());
 		}
 		
-		return view('products.show', compact('product', 'relatedProducts', 'viewToken'));
+		return view('products.show', compact('product', 'relatedProducts', 'viewToken', 'comments', 'hasPurchased', 'existingComment'));
 	}
 }

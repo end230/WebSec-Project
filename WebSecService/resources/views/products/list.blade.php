@@ -71,7 +71,150 @@
                             <h5 class="text-primary">${{ number_format($product->price, 2) }}</h5>
                         </div>
                         <p class="card-text text-muted small mb-2">{{ $product->code }} | {{ $product->model }}</p>
-                        <p class="card-text">{{ \Illuminate\Support\Str::limit($product->description, 100) }}</p>
+                        <p class="card-text">{{ str($product->description)->limit(100) }}</p>
+                        
+                        <!-- Rating and Reviews Summary -->
+                        @if($product->getReviewCount() > 0)
+                            <div class="mb-3">
+                                <div class="d-flex align-items-center">
+                                    @for($i = 1; $i <= 5; $i++)
+                                        @if($i <= round($product->getAverageRating()))
+                                            <i class="bi bi-star-fill text-warning"></i>
+                                        @else
+                                            <i class="bi bi-star text-muted"></i>
+                                        @endif
+                                    @endfor
+                                    <span class="ms-2 small">
+                                        {{ number_format($product->getAverageRating(), 1) }} ({{ $product->getReviewCount() }} {{ $product->getReviewCount() === 1 ? 'review' : 'reviews' }})
+                                    </span>
+                                </div>
+                            </div>
+                        @endif
+
+                        <!-- Recent Comments -->
+                        @if($product->comments->count() > 0)
+                            <div class="mb-3">
+                                <h6 class="text-muted mb-2">Recent Reviews:</h6>
+                                @foreach($product->comments->take(2) as $comment)
+                                    <div class="mb-2 p-2 bg-light rounded">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <div>
+                                                <div class="d-flex align-items-center mb-1">
+                                                    @for($i = 1; $i <= 5; $i++)
+                                                        @if($i <= $comment->rating)
+                                                            <i class="bi bi-star-fill text-warning" style="font-size: 0.8rem;"></i>
+                                                        @else
+                                                            <i class="bi bi-star text-muted" style="font-size: 0.8rem;"></i>
+                                                        @endif
+                                                    @endfor
+                                                    <small class="ms-2 fw-bold">{{ $comment->user->name }}</small>
+                                                    @if($comment->is_verified_purchase)
+                                                        <span class="badge bg-success ms-1" style="font-size: 0.6rem;">Verified</span>
+                                                    @endif
+                                                </div>
+                                                <p class="mb-0 small">{{ str($comment->comment)->limit(60) }}</p>
+                                            </div>
+                                            <small class="text-muted">{{ $comment->created_at->diffForHumans() }}</small>
+                                        </div>
+                                    </div>
+                                @endforeach
+                                @if($product->comments->count() > 2)
+                                    <small class="text-muted">
+                                        <a href="{{ route('products.show', $product) }}" class="text-decoration-none">
+                                            View all {{ $product->comments->count() }} reviews
+                                        </a>
+                                    </small>
+                                @endif
+                            </div>
+                        @endif
+
+                        <!-- Quick Review Section -->
+                        @auth
+                            @if(isset($userPurchases[$product->id]) && !isset($userComments[$product->id]))
+                                <!-- User can leave a quick review -->
+                                <div class="mt-3 pt-3 border-top">
+                                    <h6 class="text-success mb-2">
+                                        <i class="bi bi-check-circle me-1"></i>You can review this product!
+                                    </h6>
+                                    <form action="{{ route('products.comments.store', $product) }}" method="POST" class="quick-review-form">
+                                        @csrf
+                                        <div class="mb-2">
+                                            <div class="d-flex align-items-center">
+                                                <small class="me-2">Rating:</small>
+                                                <div class="rating-quick">
+                                                    @for($i = 5; $i >= 1; $i--)
+                                                        <input type="radio" name="rating" value="{{ $i }}" id="quick-star{{ $i }}-{{ $product->id }}" required>
+                                                        <label for="quick-star{{ $i }}-{{ $product->id }}" class="star-quick">
+                                                            <i class="bi bi-star-fill"></i>
+                                                        </label>
+                                                    @endfor
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="mb-2">
+                                            <textarea name="comment" class="form-control form-control-sm" rows="2" 
+                                                placeholder="Write your review..." maxlength="500" required></textarea>
+                                        </div>
+                                        <div class="d-flex justify-content-between">
+                                            <button type="submit" class="btn btn-success btn-sm">
+                                                <i class="bi bi-send me-1"></i>Submit Review
+                                            </button>
+                                            <a href="{{ route('products.show', $product) }}" class="btn btn-outline-primary btn-sm">
+                                                <i class="bi bi-eye me-1"></i>View Details
+                                            </a>
+                                        </div>
+                                    </form>
+                                </div>
+                            @elseif(isset($userComments[$product->id]))
+                                <!-- User has already reviewed -->
+                                <div class="mt-3 pt-3 border-top">
+                                    <div class="alert alert-success py-2 mb-2">
+                                        <small><i class="bi bi-check-circle me-1"></i>You've reviewed this product!</small>
+                                    </div>
+                                    <a href="{{ route('products.show', $product) }}" class="btn btn-outline-primary btn-sm w-100">
+                                        <i class="bi bi-eye me-1"></i>View Your Review
+                                    </a>
+                                </div>
+                            @elseif(!isset($userPurchases[$product->id]))
+                                <!-- User hasn't purchased -->
+                                <div class="mt-3 pt-3 border-top">
+                                    <div class="alert alert-warning py-2 mb-2">
+                                        <small><i class="bi bi-info-circle me-1"></i>Purchase to review this product</small>
+                                    </div>
+                                    <a href="{{ route('products.show', $product) }}" class="btn btn-outline-primary btn-sm w-100">
+                                        <i class="bi bi-eye me-1"></i>View Details
+                                    </a>
+                                </div>
+                            @endif
+                        @else
+                            <!-- Guest user -->
+                            @if($product->comments->count() === 0)
+                                <div class="mt-3 pt-3 border-top">
+                                    <div class="alert alert-info py-2 mb-2">
+                                        <small><i class="bi bi-info-circle me-1"></i>No reviews yet. Be the first!</small>
+                                    </div>
+                                    <div class="d-flex gap-2">
+                                        <a href="{{ route('login') }}" class="btn btn-outline-success btn-sm flex-fill">
+                                            <i class="bi bi-person me-1"></i>Sign In
+                                        </a>
+                                        <a href="{{ route('products.show', $product) }}" class="btn btn-outline-primary btn-sm flex-fill">
+                                            <i class="bi bi-eye me-1"></i>Details
+                                        </a>
+                                    </div>
+                                </div>
+                            @else
+                                <div class="mt-3 pt-3 border-top">
+                                    <div class="d-flex gap-2">
+                                        <a href="{{ route('login') }}" class="btn btn-outline-success btn-sm flex-fill">
+                                            <i class="bi bi-person me-1"></i>Sign In to Review
+                                        </a>
+                                        <a href="{{ route('products.show', $product) }}" class="btn btn-outline-primary btn-sm flex-fill">
+                                            <i class="bi bi-eye me-1"></i>View Details
+                                        </a>
+                                    </div>
+                                </div>
+                            @endif
+                        @endauth
                     </div>
 
                     <div class="card-footer bg-transparent border-top-0">
@@ -175,8 +318,89 @@
                 }
             });
         });
+
+        // Quick review form handling
+        const quickReviewForms = document.querySelectorAll('.quick-review-form');
+        quickReviewForms.forEach(form => {
+            form.addEventListener('submit', function(e) {
+                const submitBtn = this.querySelector('button[type="submit"]');
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Submitting...';
+            });
+        });
     });
 </script>
+
+<style>
+/* Quick rating styles */
+.rating-quick {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+}
+
+.rating-quick input[type="radio"] {
+    display: none;
+}
+
+.rating-quick label.star-quick {
+    font-size: 1rem;
+    color: #ddd;
+    cursor: pointer;
+    margin: 0 1px;
+    transition: color 0.3s;
+}
+
+.rating-quick label.star-quick:hover,
+.rating-quick label.star-quick:hover ~ label.star-quick,
+.rating-quick input[type="radio"]:checked ~ label.star-quick {
+    color: #ffc107;
+}
+
+/* Product card enhancements */
+.product-card {
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.product-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+}
+
+/* Comment section styles */
+.product-card .bg-light {
+    border-left: 3px solid #dee2e6;
+}
+
+.product-card .alert {
+    border: none;
+    border-radius: 6px;
+}
+
+.product-card .border-top {
+    border-color: #e9ecef !important;
+}
+
+/* Button group spacing */
+.btn-group .btn {
+    border-radius: 4px !important;
+}
+
+.btn-group .btn:not(:last-child) {
+    margin-right: 4px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .product-card .d-flex.gap-2 {
+        flex-direction: column;
+    }
+    
+    .product-card .d-flex.gap-2 .btn {
+        margin-bottom: 4px;
+    }
+}
+</style>
 @endpush
 
 @endsection

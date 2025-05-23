@@ -50,17 +50,27 @@
           <!-- Employee Links - Only visible to users with view_customer_feedback permission -->
           @if(auth()->user()->hasPermissionTo('view_customer_feedback'))
             <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" id="feedbackDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                <i class="fas fa-comment-alt"></i> Feedback
+              <a class="nav-link dropdown-toggle" href="#" id="customerServiceDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fas fa-headset"></i> Customer Service
               </a>
-              <ul class="dropdown-menu" aria-labelledby="feedbackDropdown">
-                @if(auth()->user()->hasRole('Customer Service'))
-                  <li><a class="dropdown-item" href="{{ route('feedback.dashboard') }}">
-                    <i class="bi bi-speedometer2"></i> Dashboard
-                  </a></li>
-                  <li><hr class="dropdown-divider"></li>
-                @endif
-                <li><a class="dropdown-item" href="{{ route('feedback.index') }}">View All Feedback</a></li>
+              <ul class="dropdown-menu" aria-labelledby="customerServiceDropdown">
+                <li><a class="dropdown-item" href="{{ route('customer-service.dashboard') }}">
+                  <i class="bi bi-speedometer2"></i> Dashboard
+                </a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="{{ route('customer-service.index') }}">
+                  <i class="bi bi-ticket-detailed"></i> All Cases
+                </a></li>
+                <li><a class="dropdown-item" href="{{ route('comments.index') }}">
+                  <i class="bi bi-chat-left-text"></i> Product Comments
+                </a></li>
+                <li><a class="dropdown-item" href="{{ route('customer-service.analytics') }}">
+                  <i class="bi bi-graph-up"></i> Analytics
+                </a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="{{ route('feedback.index') }}">
+                  <i class="bi bi-envelope"></i> Order Feedback
+                </a></li>
               </ul>
             </li>
           @endif
