@@ -118,7 +118,7 @@ Route::middleware(['auth'])->group(function () {
 
 // Role management routes
 Route::middleware(['auth'])->group(function () {
-    Route::middleware(['permission:manage_roles'])->group(function () {
+    Route::middleware(['permission:manage_roles_permissions'])->group(function () {
         Route::get('/roles', [RolesController::class, 'index'])->name('roles.index');
         Route::get('/roles/create', [RolesController::class, 'create'])->name('roles.create');
         Route::post('/roles', [RolesController::class, 'store'])->name('roles.store');
@@ -173,6 +173,7 @@ Route::get('/calculator', function () {
 // Feedback Routes
 Route::middleware(['auth', 'permission:view_customer_feedback|respond_to_feedback'])->group(function () {
     Route::get('/feedback', [FeedbackController::class, 'index'])->name('feedback.index');
+    Route::get('/feedback/dashboard', [FeedbackController::class, 'dashboard'])->name('feedback.dashboard');
     Route::get('/feedback/{feedback}', [FeedbackController::class, 'show'])->name('feedback.show');
     Route::post('/feedback/{feedback}/respond', [FeedbackController::class, 'respond'])->name('feedback.respond');
 });
@@ -195,11 +196,21 @@ Route::post('/save-theme-preferences', [App\Http\Controllers\Web\UsersController
 Route::get('verify', [UsersController::class, 'verify'])->name('verify');
 
 // Admin Management Routes
-Route::middleware(['auth', 'role:Editor'])->group(function () {
+Route::middleware(['auth', 'permission:manage_roles_permissions|assign_admin_role'])->group(function () {
     Route::get('/admin-management', [AdminManagementController::class, 'index'])
         ->name('admin-management.index');
     Route::get('/admin-management/create', [AdminManagementController::class, 'create'])
         ->name('admin-management.create');
     Route::post('/admin-management', [AdminManagementController::class, 'store'])
         ->name('admin-management.store');
+    Route::get('/admin-management/{admin}/edit', [AdminManagementController::class, 'edit'])
+        ->name('admin-management.edit');
+    Route::put('/admin-management/{admin}', [AdminManagementController::class, 'update'])
+        ->name('admin-management.update');
+});
+
+// Editor Permission Toggle - Only Editors can access this
+Route::middleware(['auth', 'role:Editor'])->group(function () {
+    Route::post('/admin-management/{admin}/toggle-editor-permissions', [AdminManagementController::class, 'toggleEditorPermissions'])
+        ->name('admin-management.toggle-editor-permissions');
 });
