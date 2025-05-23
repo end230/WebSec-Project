@@ -17,7 +17,7 @@ class RolesController extends Controller
     public function index()
     {
         // Check if user has permission to manage roles
-        if (!auth()->user()->hasPermissionTo('admin_users')) {
+        if (!auth()->user()->hasPermissionTo('manage_roles')) {
             abort(403, 'Unauthorized action.');
         }
 
@@ -31,7 +31,7 @@ class RolesController extends Controller
     public function create()
     {
         // Check if user has permission to manage roles
-        if (!auth()->user()->hasPermissionTo('admin_users')) {
+        if (!auth()->user()->hasPermissionTo('manage_roles')) {
             abort(403, 'Unauthorized action.');
         }
 
@@ -45,7 +45,7 @@ class RolesController extends Controller
     public function store(Request $request)
     {
         // Check if user has permission to manage roles
-        if (!auth()->user()->hasPermissionTo('admin_users')) {
+        if (!auth()->user()->hasPermissionTo('manage_roles')) {
             abort(403, 'Unauthorized action.');
         }
 
@@ -85,7 +85,7 @@ class RolesController extends Controller
     public function edit(Role $role)
     {
         // Check if user has permission to manage roles
-        if (!auth()->user()->hasPermissionTo('admin_users')) {
+        if (!auth()->user()->hasPermissionTo('manage_roles')) {
             abort(403, 'Unauthorized action.');
         }
 
@@ -102,7 +102,7 @@ class RolesController extends Controller
     public function update(Request $request, Role $role)
     {
         // Check if user has permission to manage roles
-        if (!auth()->user()->hasPermissionTo('admin_users')) {
+        if (!auth()->user()->hasPermissionTo('manage_roles')) {
             abort(403, 'Unauthorized action.');
         }
 
@@ -147,7 +147,7 @@ class RolesController extends Controller
     public function destroy(Role $role)
     {
         // Check if user has permission to manage roles
-        if (!auth()->user()->hasPermissionTo('admin_users')) {
+        if (!auth()->user()->hasPermissionTo('manage_roles')) {
             abort(403, 'Unauthorized action.');
         }
 
