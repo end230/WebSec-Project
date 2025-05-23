@@ -15,6 +15,12 @@ Route::get('login', [UsersController::class, 'login'])->name('login');
 Route::post('login', [UsersController::class, 'doLogin'])->name('do_login')->middleware('rate.login');
 Route::get('logout', [UsersController::class, 'doLogout'])->name('do_logout');
 
+// Password Reset Routes
+Route::get('forgot-password', [UsersController::class, 'showForgotPasswordForm'])->name('password.request');
+Route::post('forgot-password', [UsersController::class, 'sendResetLinkEmail'])->name('password.email');
+Route::get('reset-password/{token}', [UsersController::class, 'showResetForm'])->name('password.reset');
+Route::post('reset-password', [UsersController::class, 'resetPassword'])->name('password.update');
+
 // Social login routes with rate limiting
 Route::middleware(['throttle:10,1'])->group(function () {
     // Google OAuth Routes
@@ -28,6 +34,10 @@ Route::middleware(['throttle:10,1'])->group(function () {
     // Facebook OAuth Routes
     Route::get('login/facebook', [UsersController::class, 'redirectToFacebook'])->name('login.facebook');
     Route::get('login/facebook/callback', [UsersController::class, 'handleFacebookCallback']);
+
+    // GitHub OAuth Routes
+    Route::get('login/github', [UsersController::class, 'redirectToGithub'])->name('login.github');
+    Route::get('login/github/callback', [UsersController::class, 'handleGithubCallback']);
 }); 
 
 // User management
@@ -179,3 +189,6 @@ Route::get('/fix-admin-permissions', [App\Http\Controllers\Web\UsersController::
 // Theme preferences route
 Route::post('/save-theme-preferences', [App\Http\Controllers\Web\UsersController::class, 'saveThemePreferences'])
     ->middleware(['auth'])->name('save.theme.preferences');
+
+// Verify email route
+Route::get('verify', [UsersController::class, 'verify'])->name('verify');

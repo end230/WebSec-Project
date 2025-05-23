@@ -19,7 +19,7 @@ return new class extends Migration
             
             // Add linkedin_id column
             if (!Schema::hasColumn('users', 'linkedin_id')) {
-                $table->string('linkedin_id')->nullable();
+                $table->string('linkedin_id')->nullable()->after('google_id');
             }
         });
     }
@@ -32,7 +32,7 @@ return new class extends Migration
         Schema::table('users', function (Blueprint $table) {
             // Add facebook_id back
             if (!Schema::hasColumn('users', 'facebook_id')) {
-                $table->string('facebook_id')->nullable();
+                $table->string('facebook_id')->nullable()->after('google_id');
             }
             
             // Remove linkedin_id

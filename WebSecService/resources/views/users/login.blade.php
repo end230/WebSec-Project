@@ -23,6 +23,9 @@
       <div class="form-group mb-3">
         <label for="password" class="form-label">Password:</label>
         <input type="password" class="form-control" placeholder="Enter your password" name="password" id="password" autocomplete="current-password" required>
+        <div class="text-end mt-2">
+          <a href="{{ route('password.request') }}" class="small text-decoration-none">Forgot your password?</a>
+        </div>
       </div>
       <div class="form-group mb-4">
         <button type="submit" class="btn btn-primary w-100 py-2">Login</button>
@@ -42,6 +45,10 @@
         </a>
         <a href="{{ route('login.facebook') }}" class="btn btn-facebook position-relative">
           <i class="bi bi-facebook me-2"></i> Login with Facebook
+          <span class="position-absolute end-0 me-3 top-50 translate-middle-y">→</span>
+        </a>
+        <a href="{{ route('login.github') }}" class="btn btn-github position-relative">
+          <i class="bi bi-github me-2"></i> Login with GitHub
           <span class="position-absolute end-0 me-3 top-50 translate-middle-y">→</span>
         </a>
       </div>
@@ -64,6 +71,11 @@
 .btn-facebook {
   background-color: #1877F2;
   border-color: #1877F2;
+  color: white;
+}
+.btn-github {
+  background-color: #24292e;
+  border-color: #24292e;
   color: white;
 }
 </style>
