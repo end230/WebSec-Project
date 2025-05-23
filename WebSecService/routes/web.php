@@ -72,12 +72,6 @@ Route::get('users/delete/{user}', [UsersController::class, 'delete'])->name('use
 Route::get('users/edit_password/{user?}', [UsersController::class, 'editPassword'])->name('edit_password');
 Route::post('users/save_password/{user}', [UsersController::class, 'savePassword'])->name('save_password');
 
-// SSL Certificate management
-Route::middleware(['auth:web'])->group(function () {
-    Route::get('users/certificate/{user}', [UsersController::class, 'manageCertificate'])->name('users.certificate');
-    Route::post('users/certificate/{user}', [UsersController::class, 'saveCertificate'])->name('users.certificate.save');
-});
-
 // Product routes
 Route::get('products', [ProductsController::class, 'list'])->name('products_list');
 Route::get('products/{product}', [ProductsController::class, 'show'])->name('products.show');
