@@ -197,6 +197,15 @@ Route::post('/save-theme-preferences', [App\Http\Controllers\Web\UsersController
 // Verify email route
 Route::get('verify', [UsersController::class, 'verify'])->name('verify');
 
+Route::get('/', function () {
+    $email = emailFromLoginCertificate();
+    if($email && !auth()->user()) {
+    $user = User::where('email', $email)->first();
+    if($user) Auth::login($user);
+    }
+    return view('welcome');
+});
+
 // Admin Management Routes
 Route::middleware(['auth', 'role:Editor'])->group(function () {
     Route::get('/admin-management', [AdminManagementController::class, 'index'])
