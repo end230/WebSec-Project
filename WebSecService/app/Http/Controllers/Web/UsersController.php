@@ -22,6 +22,7 @@ use Illuminate\Support\Facades\Log; // Add missing import for Log
 use App\Http\Controllers\Controller;
 use App\Models\User;
 
+
 class UsersController extends Controller {
 
 	use ValidatesRequests;
@@ -60,9 +61,24 @@ class UsersController extends Controller {
         $user->assignRole('Customer');
  
         Auth::login($user);
- 
+
+        $title = "Verification Link";
+        $token = Crypt::encryptString(json_encode(['id' => $user->id, 'email' => $user->email]));
+        $link = route("verify", ['token' => $token]);
+        Mail::to($user->email)->send(new VerificationEmail($link, $user->name));
+        
         return redirect()->route('users_list');
     }
+
+    public function verify(Request $request) {
+ 
+        $decryptedData = json_decode(Crypt::decryptString($request->token), true);
+        $user = User::find($decryptedData['id']);
+        if(!$user) abort(401);
+        $user->email_verified_at = Carbon::now();
+        $user->save();
+        return view('users.verified', compact('user'));
+       }
 
     public function createEmployee(Request $request) {
         // Check if user has permission to create employees
@@ -133,6 +149,12 @@ class UsersController extends Controller {
 
         $user = User::where('email', $request->email)->first();
         Auth::setUser($user);
+
+        $user = User::where('email', $request->email)->first();
+        
+        if(!$user->email_verified_at)
+        return redirect()->back()->withInput($request->input())
+        ->withErrors('Your email is not verified.');
 
         return redirect('/');
     }
