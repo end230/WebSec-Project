@@ -29,8 +29,8 @@
             </li>
           @endif
           
-          <!-- Role Management Links - Visible to users with manage_roles_permissions permission -->
-          @if(auth()->user()->hasPermissionTo('manage_roles_permissions'))
+          <!-- Role Management Links - Visible to users with manage_roles permission -->
+          @if(auth()->user()->hasPermissionTo('manage_roles'))
             <li class="nav-item">
               <a class="nav-link d-flex align-items-center" href="{{ route('roles.index') }}">
                 <i class="fas fa-user-tag"></i> Manage Roles
@@ -38,8 +38,8 @@
             </li>
           @endif
           
-          <!-- Admin Management Links - Visible to users with manage_roles_permissions or assign_admin_role permission -->
-          @if(auth()->user()->hasPermissionTo('manage_roles_permissions') || auth()->user()->hasPermissionTo('assign_admin_role'))
+          <!-- Admin Management Links - Visible to users with manage_roles or assign_admin_role permission -->
+          @if(auth()->user()->hasPermissionTo('manage_roles') || auth()->user()->hasPermissionTo('manage_permissions') || auth()->user()->hasPermissionTo('assign_admin_role'))
             <li class="nav-item">
               <a class="nav-link d-flex align-items-center" href="{{ route('admin-management.index') }}">
                 <i class="fas fa-user-shield"></i> Manage Admins

@@ -4,13 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Models\Role;
 
 class AdminManagementController extends Controller
 {
     public function __construct()
     {
-        $this->middleware(['auth', 'permission:manage_roles_permissions|assign_admin_role']);
+        $this->middleware(['auth', 'permission:manage_roles|manage_permissions|assign_admin_role']);
     }
 
     /**
@@ -117,7 +118,7 @@ class AdminManagementController extends Controller
     public function toggleEditorPermissions(Request $request, User $admin)
     {
         // Ensure only actual Editors (with the Editor role) can toggle permissions
-        if (!auth()->user()->hasRole('Editor')) {
+        if (!Auth::user()->hasRole('Editor')) {
             abort(403, 'Only Editors can grant or remove editor permissions.');
         }
 

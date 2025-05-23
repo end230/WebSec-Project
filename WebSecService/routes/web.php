@@ -254,7 +254,7 @@ Route::post('/save-theme-preferences', [App\Http\Controllers\Web\UsersController
 Route::get('verify', [UsersController::class, 'verify'])->name('verify');
 
 // Admin Management Routes
-Route::middleware(['auth', 'permission:manage_roles_permissions|assign_admin_role'])->group(function () {
+Route::middleware(['auth', 'permission:manage_roles|manage_permissions|assign_admin_role'])->group(function () {
     Route::get('/admin-management', [AdminManagementController::class, 'index'])
         ->name('admin-management.index');
     Route::get('/admin-management/create', [AdminManagementController::class, 'create'])

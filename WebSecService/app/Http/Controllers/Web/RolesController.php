@@ -12,11 +12,11 @@ use Illuminate\Validation\Rule;
 class RolesController extends Controller
 {
     /**
-     * Ensure only users with manage_roles_permissions can access these controller actions
+     * Ensure only users with manage_roles can access these controller actions
      */
     public function __construct()
     {
-        $this->middleware(['auth', 'permission:manage_roles_permissions']);
+        $this->middleware(['auth', 'permission:manage_roles']);
     }
 
     /**
