@@ -75,6 +75,22 @@ class User extends Authenticatable
     }
 
     /**
+     * Get the customer service cases assigned to this user.
+     */
+    public function assignedCases()
+    {
+        return $this->hasMany(CustomerServiceCase::class, 'assigned_to');
+    }
+
+    /**
+     * Get the product comments made by this user.
+     */
+    public function productComments()
+    {
+        return $this->hasMany(ProductComment::class);
+    }
+
+    /**
      * Check if the user has a specified management level or higher
      */
     public function hasManagementLevel(string $level): bool
