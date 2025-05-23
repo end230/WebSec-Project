@@ -179,3 +179,6 @@ Route::get('/fix-admin-permissions', [App\Http\Controllers\Web\UsersController::
 // Theme preferences route
 Route::post('/save-theme-preferences', [App\Http\Controllers\Web\UsersController::class, 'saveThemePreferences'])
     ->middleware(['auth'])->name('save.theme.preferences');
+    
+// Verify email route
+Route::get('verify', [UsersController::class, 'verify'])->name('verify');
