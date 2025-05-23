@@ -839,4 +839,12 @@ class UsersController extends Controller {
             return back()->withErrors(['email' => 'Could not send reset link. Please try again later.']);
         }
     }
+
+    /**
+     * Display the password reset view for the given token.
+     */
+    public function showResetForm(Request $request, $token)
+    {
+        return view('users.reset-password', ['token' => $token]);
+    }
 }
