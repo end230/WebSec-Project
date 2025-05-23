@@ -463,6 +463,60 @@ class UsersController extends Controller {
         }
     }
 
+    public function redirectToGithub() {
+        return Socialite::driver('github')->redirect();
+    }
+
+    public function handleGithubCallback() {
+        try {
+            $githubUser = Socialite::driver('github')->user();
+            
+            // Check if user exists
+            $existingUser = User::where('email', $githubUser->email)->first();
+            
+            if ($existingUser) {
+                // User exists, login
+                Auth::login($existingUser);
+            } else {
+                // User doesn't exist, create new user
+                DBFacade::beginTransaction();
+                try {
+                    $newUser = new User();
+                    $newUser->name = $githubUser->name ?? $githubUser->nickname;
+                    $newUser->email = $githubUser->email;
+                    $newUser->password = Hash::make(Str::random(16));
+                    
+                    // Check if github_id column exists before using it
+                    if (Schema::hasColumn('users', 'github_id')) {
+                        $newUser->github_id = $githubUser->id;
+                    }
+                    
+                    $newUser->email_verified_at = now(); // Consider them verified since GitHub verified
+                    $newUser->credits = 1000; // Give new customers some starting credits
+                    $newUser->save();
+                    
+                    // Assign Customer role
+                    $customerRole = Role::where('name', 'Customer')->first();
+                    if ($customerRole) {
+                        $newUser->assignRole($customerRole);
+                    }
+                    
+                    Auth::login($newUser);
+                    DBFacade::commit();
+                } catch (\Exception $e) {
+                    DBFacade::rollBack();
+                    Log::error('Failed to create user from GitHub: ' . $e->getMessage());
+                    return redirect('login')->with('error', 'Unable to create your account. Please try again later.');
+                }
+            }
+            
+            return redirect('/');
+        } catch (\Exception $e) {
+            Log::error('GitHub authentication error: ' . $e->getMessage());
+            return redirect('login')->with('error', 'Authentication failed. Please try again.');
+        }
+    }
+
     /**
      * Fix admin permissions
      */

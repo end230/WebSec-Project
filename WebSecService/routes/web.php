@@ -28,6 +28,10 @@ Route::middleware(['throttle:10,1'])->group(function () {
     // Facebook OAuth Routes
     Route::get('login/facebook', [UsersController::class, 'redirectToFacebook'])->name('login.facebook');
     Route::get('login/facebook/callback', [UsersController::class, 'handleFacebookCallback']);
+
+    // GitHub OAuth Routes
+    Route::get('login/github', [UsersController::class, 'redirectToGithub'])->name('login.github');
+    Route::get('login/github/callback', [UsersController::class, 'handleGithubCallback']);
 }); 
 
 // User management
