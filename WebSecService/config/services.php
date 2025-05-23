@@ -34,5 +34,44 @@ return [
             'channel' => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
         ],
     ],
+    
+    'notifications' => [
+        'feedback_analysis' => [
+            'enabled' => env('FEEDBACK_ANALYSIS_ENABLED', true),
+            'threshold_score' => env('FEEDBACK_ANALYSIS_THRESHOLD', 3),
+            'alert_on_negative' => env('FEEDBACK_ALERT_ON_NEGATIVE', true),
+        ],
+        'cancellation_alerts' => [
+            'enabled' => env('CANCELLATION_ALERTS_ENABLED', true),
+            'threshold_percentage' => env('CANCELLATION_THRESHOLD', 5), // Alert if cancellation rate exceeds 5%
+        ],
+    ],
+    
+    'permission_descriptions' => [
+        'manage_users' => 'Allows creating, editing, and deleting user accounts',
+        'manage_roles' => 'Allows creating, editing, and deleting roles in the system',
+        'manage_permissions' => 'Allows assigning and revoking permissions to roles and users',
+        'manage_orders' => 'Allows viewing and updating the status of customer orders',
+        'cancel_order' => 'Allows cancellation of orders and processing refunds',
+        // Add more permission descriptions as needed
+    ],
+
+    'google' => [
+        'client_id' => env('GOOGLE_CLIENT_ID'),
+        'client_secret' => env('GOOGLE_CLIENT_SECRET'),
+        'redirect' => env('GOOGLE_REDIRECT_URI'),
+    ],
+
+    'linkedin' => [
+        'client_id' => env('LINKEDIN_CLIENT_ID'),
+        'client_secret' => env('LINKEDIN_CLIENT_SECRET'),
+        'redirect' => env('LINKEDIN_REDIRECT_URI'),
+    ],
+
+    'facebook' => [
+        'client_id' => env('FACEBOOK_CLIENT_ID'),
+        'client_secret' => env('FACEBOOK_CLIENT_SECRET'),
+        'redirect' => env('FACEBOOK_REDIRECT_URI'),
+    ],
 
 ];

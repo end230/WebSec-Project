@@ -8,7 +8,10 @@
     "require": {
         "php": "^8.2",
         "laravel/framework": "^12.0",
-        "laravel/tinker": "^2.10.1"
+        "laravel/socialite": "*",
+        "laravel/tinker": "^2.10.1",
+        "laravel/ui": "^4.6",
+        "spatie/laravel-permission": "^6.16"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
@@ -24,7 +27,10 @@
             "App\\": "app/",
             "Database\\Factories\\": "database/factories/",
             "Database\\Seeders\\": "database/seeders/"
-        }
+        },
+        "files": [
+            "app/Helpers/PermissionHelper.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {
@@ -34,7 +40,8 @@
     "scripts": {
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
-            "@php artisan package:discover --ansi"
+            "@php artisan vendor:publish --tag=laravel-assets --ansi --force || true",
+            "@php artisan package:discover --ansi || @php artisan vendor:discover --ansi || true"
         ],
         "post-update-cmd": [
             "@php artisan vendor:publish --tag=laravel-assets --ansi --force"
