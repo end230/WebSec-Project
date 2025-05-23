@@ -23,6 +23,9 @@
       <div class="form-group mb-3">
         <label for="password" class="form-label">Password:</label>
         <input type="password" class="form-control" placeholder="Enter your password" name="password" id="password" autocomplete="current-password" required>
+        <div class="text-end mt-2">
+          <a href="{{ route('password.request') }}" class="small text-decoration-none">Forgot your password?</a>
+        </div>
       </div>
       <div class="form-group mb-4">
         <button type="submit" class="btn btn-primary w-100 py-2">Login</button>
