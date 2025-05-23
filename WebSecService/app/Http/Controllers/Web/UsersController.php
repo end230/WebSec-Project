@@ -781,4 +781,62 @@ class UsersController extends Controller {
         return redirect()->route('users.certificate', $user)
             ->with('success', 'SSL certificate information updated successfully.');
     }
+
+    /**
+     * Show the form for requesting a password reset link.
+     */
+    public function showForgotPasswordForm()
+    {
+        return view('users.forgot-password');
+    }
+    
+    /**
+     * Send a password reset link to the given user.
+     */
+    public function sendResetLinkEmail(Request $request)
+    {
+        $request->validate(['email' => 'required|email']);
+
+        // Create a password reset token
+        $token = Str::random(64);
+        
+        // Delete any existing tokens for this user
+        DBFacade::table('password_resets')->where('email', $request->email)->delete();
+        
+        // Insert new token
+        DBFacade::table('password_resets')->insert([
+            'email' => $request->email,
+            'token' => $token,
+            'created_at' => Carbon::now()
+        ]);
+        
+        // Get the user
+        $user = User::where('email', $request->email)->first();
+        
+        if (!$user) {
+            // Don't reveal that the user doesn't exist
+            return back()->with('status', 'We have emailed your password reset link!');
+        }
+        
+        // Create reset URL
+        $resetUrl = route('password.reset', ['token' => $token]);
+        
+        // Send the password reset email
+        try {
+            Mail::send(
+                ['html' => 'emails.password-reset', 'text' => 'emails.password-reset-plain'],
+                ['resetUrl' => $resetUrl, 'user' => $user],
+                function($message) use ($user) {
+                    $message->to($user->email);
+                    $message->subject('Reset Your Password');
+                }
+            );
+            
+            Log::info("Password reset email sent to: {$user->email}");
+            return back()->with('status', 'We have emailed your password reset link!');
+        } catch (\Exception $e) {
+            Log::error("Failed to send password reset email: " . $e->getMessage());
+            return back()->withErrors(['email' => 'Could not send reset link. Please try again later.']);
+        }
+    }
 }
