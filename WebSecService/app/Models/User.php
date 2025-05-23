@@ -39,10 +39,6 @@ class User extends Authenticatable
         'facebook_id',
         'linkedin_id',
         'github_id',
-        'certificate_cn',
-        'certificate_serial',
-        'certificate_dn',
-        'last_certificate_login',
     ];
 
     /**
