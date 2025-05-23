@@ -96,4 +96,31 @@ class FeedbackController extends Controller
         return redirect()->route('feedback.show', $feedback->id)
             ->with('success', 'Your response has been submitted successfully.');
     }
+
+    /**
+     * Show a customer service dashboard
+     */
+    public function dashboard(Request $request)
+    {
+        // Check if user has Customer Service permissions
+        if (!auth()->user()->hasRole('Customer Service') && 
+            !auth()->user()->hasPermissionTo('view_customer_feedback')) {
+            abort(403, 'You do not have permission to access the Customer Service dashboard.');
+        }
+        
+        // Get statistics for the dashboard
+        $stats = [
+            'total_feedback' => Feedback::count(),
+            'open_feedback' => Feedback::where('resolved', false)->count(),
+            'resolved_feedback' => Feedback::where('resolved', true)->count(),
+            'user_role' => auth()->user()->getRoleNames()->first(),
+            'management_level' => auth()->user()->management_level,
+            'permissions' => auth()->user()->getAllPermissions()->pluck('name')->toArray()
+        ];
+        
+        // Get recent feedback for quick access
+        $recentFeedback = Feedback::orderBy('created_at', 'desc')->limit(5)->get();
+        
+        return view('feedback.dashboard', compact('stats', 'recentFeedback'));
+    }
 }

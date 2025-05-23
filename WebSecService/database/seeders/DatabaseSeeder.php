@@ -57,6 +57,9 @@ class DatabaseSeeder extends Seeder
         // Run permission seeder to ensure all permissions are properly assigned
         $this->call(PermissionSeeder::class);
         
+        // Run customer service role seeder
+        $this->call(CustomerServiceRoleSeeder::class);
+        
         // Seed products
         $this->call(ProductSeeder::class);
     }

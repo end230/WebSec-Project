@@ -44,6 +44,10 @@ class PermissionSeeder extends Seeder
             
             // Order cancellation permission
             'cancel_order',
+            
+            // Editor specific permissions
+            'manage_roles_permissions',
+            'assign_admin_role',
         ];
 
         foreach ($permissions as $permission) {
@@ -54,6 +58,11 @@ class PermissionSeeder extends Seeder
         $adminRole = Role::findByName('Admin');
         $employeeRole = Role::findByName('Employee');
         $customerRole = Role::findByName('Customer');
+        
+        // Create Editor role if it doesn't exist
+        $editorRole = Role::firstOrCreate(['name' => 'Editor'], [
+            'management_level' => 'high'
+        ]);
         
         // Add permissions to Admin role
         $adminRole->givePermissionTo([
@@ -76,6 +85,17 @@ class PermissionSeeder extends Seeder
             'receive_cancellation_notifications',
             'manage_notifications',
             'cancel_order',
+        ]);
+        
+        // Add permissions to Editor role
+        $editorRole->givePermissionTo([
+            'manage_roles_permissions',
+            'assign_admin_role',
+            'admin_users',
+            'manage_roles',
+            'manage_permissions',
+            'view_logs',
+            'access_admin_panel',
         ]);
         
         // Add permissions to Employee role

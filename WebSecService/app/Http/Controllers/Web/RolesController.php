@@ -12,15 +12,19 @@ use Illuminate\Validation\Rule;
 class RolesController extends Controller
 {
     /**
+     * Ensure only users with manage_roles_permissions can access these controller actions
+     */
+    public function __construct()
+    {
+        $this->middleware(['auth', 'permission:manage_roles_permissions']);
+    }
+
+    /**
      * Display a listing of all roles.
      */
     public function index()
     {
-        // Check if user has permission to manage roles
-        if (!auth()->user()->hasPermissionTo('admin_users')) {
-            abort(403, 'Unauthorized action.');
-        }
-
+        // Remove the individual permission check as we're now using middleware
         $roles = Role::with('permissions')->get();
         return view('roles.index', compact('roles'));
     }
@@ -30,11 +34,7 @@ class RolesController extends Controller
      */
     public function create()
     {
-        // Check if user has permission to manage roles
-        if (!auth()->user()->hasPermissionTo('admin_users')) {
-            abort(403, 'Unauthorized action.');
-        }
-
+        // Remove the individual permission check as we're now using middleware
         $permissions = Permission::all();
         return view('roles.create', compact('permissions'));
     }
@@ -44,10 +44,7 @@ class RolesController extends Controller
      */
     public function store(Request $request)
     {
-        // Check if user has permission to manage roles
-        if (!auth()->user()->hasPermissionTo('admin_users')) {
-            abort(403, 'Unauthorized action.');
-        }
+        // Remove the individual permission check as we're now using middleware
 
         // Validate role data
         $request->validate([
@@ -84,11 +81,8 @@ class RolesController extends Controller
      */
     public function edit(Role $role)
     {
-        // Check if user has permission to manage roles
-        if (!auth()->user()->hasPermissionTo('admin_users')) {
-            abort(403, 'Unauthorized action.');
-        }
-
+        // Remove the individual permission check as we're now using middleware
+        
         // Get all permissions with information about which ones are assigned to this role
         $permissions = Permission::all();
         $rolePermissions = $role->permissions()->pluck('id')->toArray();
@@ -101,10 +95,7 @@ class RolesController extends Controller
      */
     public function update(Request $request, Role $role)
     {
-        // Check if user has permission to manage roles
-        if (!auth()->user()->hasPermissionTo('admin_users')) {
-            abort(403, 'Unauthorized action.');
-        }
+        // Remove the individual permission check as we're now using middleware
 
         // Validate role data
         $request->validate([
@@ -113,9 +104,9 @@ class RolesController extends Controller
             'management_level' => ['nullable', 'string', 'in:low,middle,high'],
         ]);
 
-        // Prevent modifying Admin role if user is not an admin
-        if ($role->name === 'Admin' && !auth()->user()->hasRole('Admin')) {
-            return redirect()->back()->with('error', 'You cannot modify the Admin role.');
+        // Only Editor role can modify Admin role (ensured by middleware)
+        if ($role->name === 'Admin') {
+            // Allow it since the user has the Editor role (checked by middleware)
         }
 
         // Update role using DB transaction
@@ -146,13 +137,10 @@ class RolesController extends Controller
      */
     public function destroy(Role $role)
     {
-        // Check if user has permission to manage roles
-        if (!auth()->user()->hasPermissionTo('admin_users')) {
-            abort(403, 'Unauthorized action.');
-        }
+        // Remove the individual permission check as we're now using middleware
 
-        // Prevent deleting Admin, Employee or Customer roles
-        if (in_array($role->name, ['Admin', 'Employee', 'Customer'])) {
+        // Prevent deleting Admin, Employee, Customer or Editor roles
+        if (in_array($role->name, ['Admin', 'Employee', 'Customer', 'Editor'])) {
             return redirect()->back()->with('error', 'Cannot delete system roles.');
         }
 

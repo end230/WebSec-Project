@@ -20,59 +20,78 @@
           </a>
         </li>
         @auth
-          <!-- Admin Links -->
-          @if(auth()->user()->hasPermissionTo('access_admin_panel'))
+          <!-- Admin Links - Only visible to users with admin_users permission or Editor role -->
+          @if(auth()->user()->hasPermissionTo('admin_users') || auth()->user()->hasRole('Editor'))
             <li class="nav-item">
               <a class="nav-link d-flex align-items-center" href="{{ route('users') }}">
                 <i class="fas fa-users"></i> Manage Users
               </a>
             </li>
+          @endif
+          
+          <!-- Role Management Links - Visible to users with manage_roles_permissions permission -->
+          @if(auth()->user()->hasPermissionTo('manage_roles_permissions'))
             <li class="nav-item">
               <a class="nav-link d-flex align-items-center" href="{{ route('roles.index') }}">
                 <i class="fas fa-user-tag"></i> Manage Roles
               </a>
             </li>
-            <!-- Editor Links -->
           @endif
-
-          @if(auth()->user()->hasRole('Editor'))
-          <li class="nav-item">
-            <a class="nav-link d-flex align-items-center" href="{{ route('admin-management.index') }}">
-              <i class="fas fa-user-shield"></i> Manage Admins
-            </a>
-          </li>
+          
+          <!-- Admin Management Links - Visible to users with manage_roles_permissions or assign_admin_role permission -->
+          @if(auth()->user()->hasPermissionTo('manage_roles_permissions') || auth()->user()->hasPermissionTo('assign_admin_role'))
+            <li class="nav-item">
+              <a class="nav-link d-flex align-items-center" href="{{ route('admin-management.index') }}">
+                <i class="fas fa-user-shield"></i> Manage Admins
+              </a>
+            </li>
           @endif
         
-          <!-- Employee Links -->
+          <!-- Employee Links - Only visible to users with view_customer_feedback permission -->
           @if(auth()->user()->hasPermissionTo('view_customer_feedback'))
             <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle" href="#" id="feedbackDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                 <i class="fas fa-comment-alt"></i> Feedback
               </a>
               <ul class="dropdown-menu" aria-labelledby="feedbackDropdown">
+                @if(auth()->user()->hasRole('Customer Service'))
+                  <li><a class="dropdown-item" href="{{ route('feedback.dashboard') }}">
+                    <i class="bi bi-speedometer2"></i> Dashboard
+                  </a></li>
+                  <li><hr class="dropdown-divider"></li>
+                @endif
                 <li><a class="dropdown-item" href="{{ route('feedback.index') }}">View All Feedback</a></li>
               </ul>
             </li>
           @endif
 
-          <!-- Customer Links -->
-          @if(auth()->check())
-            <li class="nav-item">
-              <a class="nav-link d-flex align-items-center position-relative" href="{{ route('cart') }}">
-                <i class="bi bi-cart me-1"></i> Cart
-                @if(session()->has('cart') && count(session()->get('cart')) > 0)
-                  <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger animate__animated animate__pulse animate__infinite">
-                    {{ count(session()->get('cart')) }}
-                  </span>
-                @endif
-              </a>
-            </li>
+          <!-- Order Management Links - Only visible to users with manage_orders permission -->
+          @if(auth()->user()->hasPermissionTo('manage_orders'))
             <li class="nav-item">
               <a class="nav-link d-flex align-items-center" href="{{ route('orders.index') }}">
-                <i class="fas fa-box"></i> My Orders
+                <i class="fas fa-box"></i> Manage Orders
               </a>
             </li>
           @endif
+
+          <!-- Customer Links - Always visible to logged-in users -->
+          <li class="nav-item">
+            <a class="nav-link d-flex align-items-center position-relative" href="{{ route('cart') }}">
+              <i class="bi bi-cart me-1"></i> Cart
+              @if(session()->has('cart') && count(session()->get('cart')) > 0)
+                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger animate__animated animate__pulse animate__infinite">
+                  {{ count(session()->get('cart')) }}
+                </span>
+              @endif
+            </a>
+          </li>
+          
+          <!-- My Orders - Customer view -->
+          <li class="nav-item">
+            <a class="nav-link d-flex align-items-center" href="{{ route('orders.index') }}">
+              <i class="fas fa-shopping-bag"></i> My Orders
+            </a>
+          </li>
         @endauth
       </ul>
       <ul class="navbar-nav ms-auto">
@@ -81,6 +100,24 @@
           <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
             <i class="bi bi-person-circle me-1"></i>
             {{ auth()->user()->name }}
+            @if(auth()->user()->hasRole('Editor'))
+              <span class="badge bg-info ms-1">Editor</span>
+            @elseif(auth()->user()->hasRole('Admin'))
+              @php
+                // Check if this admin has editor-level permissions
+                $hasEditorPermissions = auth()->user()->hasEditorLevelPermissions();
+              @endphp
+              @if($hasEditorPermissions)
+                <span class="badge bg-danger ms-1">Admin</span>
+                <span class="badge bg-info ms-1">+Editor Perms</span>
+              @else
+                <span class="badge bg-danger ms-1">Admin</span>
+              @endif
+            @elseif(auth()->user()->hasRole('Employee'))
+              <span class="badge bg-success ms-1">Employee</span>
+            @elseif(auth()->user()->hasRole('Customer Service'))
+              <span class="badge bg-warning ms-1">Customer Service</span>
+            @endif
           </a>
           <!-- User dropdown menu -->
           <ul class="dropdown-menu dropdown-menu-end animate__animated animate__fadeIn" aria-labelledby="userDropdown" style="border-radius: 10px; border: 1px solid var(--border-color); box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
