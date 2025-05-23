@@ -58,10 +58,10 @@ class UsersController extends Controller {
         ]);
 
         $user->assignRole('Customer');
-
+ 
         Auth::login($user);
-
-        return redirect()->route('home');
+ 
+        return redirect()->route('users_list');
     }
 
     public function createEmployee(Request $request) {
