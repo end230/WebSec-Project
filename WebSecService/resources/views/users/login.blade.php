@@ -44,6 +44,10 @@
           <i class="bi bi-facebook me-2"></i> Login with Facebook
           <span class="position-absolute end-0 me-3 top-50 translate-middle-y">→</span>
         </a>
+        <a href="{{ route('login.github') }}" class="btn btn-github position-relative">
+          <i class="bi bi-github me-2"></i> Login with GitHub
+          <span class="position-absolute end-0 me-3 top-50 translate-middle-y">→</span>
+        </a>
       </div>
       <p class="mt-3 small text-muted">Don't have an account? <a href="{{ route('register') }}">Register now</a> or use social login</p>
     </div>
@@ -64,6 +68,11 @@
 .btn-facebook {
   background-color: #1877F2;
   border-color: #1877F2;
+  color: white;
+}
+.btn-github {
+  background-color: #24292e;
+  border-color: #24292e;
   color: white;
 }
 </style>

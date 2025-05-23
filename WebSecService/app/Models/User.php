@@ -35,6 +35,10 @@ class User extends Authenticatable
         'theme_dark_mode',
         'theme_color',
         'management_level',
+        'google_id',
+        'facebook_id',
+        'linkedin_id',
+        'github_id',
     ];
 
     /**
