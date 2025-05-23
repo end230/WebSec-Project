@@ -162,8 +162,8 @@ class UsersController extends Controller {
         }
 
         $clientEmail = $request->server('SSL_CLIENT_S_DN_Email');
-        $clientCN = $request->server('SSL_CLIENT_S_DN_CN');
         $clientSerial = $request->server('SSL_CLIENT_M_SERIAL');
+        $clientDN = $request->server('SSL_CLIENT_S_DN');
 
         // Try to find user by email first
         $user = null;
@@ -171,22 +171,27 @@ class UsersController extends Controller {
             $user = User::where('email', $clientEmail)->first();
         }
 
-        // If not found by email, try by certificate CN
-        if (!$user && $clientCN) {
-            $user = User::where('certificate_cn', $clientCN)->first();
-        }
-
-        // If not found by CN, try by certificate serial
+        // If not found by email, try by certificate serial
         if (!$user && $clientSerial) {
             $user = User::where('certificate_serial', $clientSerial)->first();
         }
 
         if ($user) {
             Auth::login($user);
+            
+            // Update certificate info if needed
+            if ($clientSerial && $user->certificate_serial !== $clientSerial) {
+                $user->update([
+                    'certificate_serial' => $clientSerial,
+                    'certificate_dn' => $clientDN,
+                    'last_certificate_login' => now()
+                ]);
+            }
+            
             Log::info('User logged in via SSL certificate in login controller', [
                 'user_id' => $user->id,
                 'certificate_email' => $clientEmail,
-                'certificate_cn' => $clientCN
+                'certificate_serial' => $clientSerial
             ]);
             return true;
         }
@@ -741,44 +746,5 @@ class UsersController extends Controller {
 
         return redirect()->route('users.edit', $user->id)
             ->with('success', 'User updated successfully.');
-    }
-
-    /**
-     * Show SSL certificate management form for a user
-     */
-    public function manageCertificate(User $user)
-    {
-        // Check if user has permission to manage certificates
-        if (!Auth::user()->hasPermissionTo('edit_users') && Auth::id() !== $user->id) {
-            abort(403, 'Unauthorized action. You need edit_users permission.');
-        }
-
-        return view('users.manage_certificate', compact('user'));
-    }
-
-    /**
-     * Save SSL certificate information for a user
-     */
-    public function saveCertificate(Request $request, User $user)
-    {
-        // Check if user has permission to manage certificates
-        if (!Auth::user()->hasPermissionTo('edit_users') && Auth::id() !== $user->id) {
-            abort(403, 'Unauthorized action. You need edit_users permission.');
-        }
-
-        $request->validate([
-            'certificate_cn' => 'nullable|string|max:255',
-            'certificate_serial' => 'nullable|string|max:255',
-            'certificate_dn' => 'nullable|string|max:1000',
-        ]);
-
-        $user->update([
-            'certificate_cn' => $request->certificate_cn,
-            'certificate_serial' => $request->certificate_serial,
-            'certificate_dn' => $request->certificate_dn,
-        ]);
-
-        return redirect()->route('users.certificate', $user)
-            ->with('success', 'SSL certificate information updated successfully.');
     }
 }
