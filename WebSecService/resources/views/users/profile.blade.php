@@ -44,6 +44,23 @@
                                         @endforeach
                                     </td>
                                 </tr>
+                                @if($user->certificate_cn || $user->certificate_serial || $user->last_certificate_login)
+                                <tr>
+                                    <th>SSL Certificate</th>
+                                    <td>
+                                        @if($user->certificate_cn)
+                                            <div><strong>CN:</strong> {{ $user->certificate_cn }}</div>
+                                        @endif
+                                        @if($user->certificate_serial)
+                                            <div><strong>Serial:</strong> {{ $user->certificate_serial }}</div>
+                                        @endif
+                                        @if($user->last_certificate_login)
+                                            <div><strong>Last Login:</strong> {{ $user->last_certificate_login->format('M d, Y H:i') }}</div>
+                                        @endif
+                                        <span class="badge bg-info">Certificate Enabled</span>
+                                    </td>
+                                </tr>
+                                @endif
                             </table>
                         </div>
 
@@ -74,7 +91,38 @@
                         @endif
 
                         @if(auth()->user()->hasPermissionTo('edit_users') || auth()->id() == $user->id)
+                            <a href="{{ route('users.certificate', $user) }}" class="btn btn-warning me-2">
+                                <i class="bi bi-shield-lock"></i> Manage SSL Certificate
+                            </a>
                             <a href="{{ route('users_edit', $user->id) }}" class="btn btn-success">Edit Profile</a>
+                        @endif
+                    </div>
+                </div>
+            </div>
+            
+            <!-- SSL Certificate Status Card -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0"><i class="bi bi-shield-check me-2"></i>SSL Certificate Status</h4>
+                </div>
+                <div class="card-body">
+                    <div id="ssl-status-content">
+                        <div class="text-center">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <p class="mt-2">Checking SSL certificate...</p>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-3 d-grid gap-2">
+                        <button class="btn btn-outline-primary btn-sm" onclick="refreshSSLStatus()">
+                            <i class="bi bi-arrow-clockwise me-1"></i> Refresh Status
+                        </button>
+                        @if(auth()->user()->hasPermissionTo('edit_users') || auth()->id() == $user->id)
+                        <a href="{{ route('users.certificate', $user) }}" class="btn btn-warning btn-sm">
+                            <i class="bi bi-gear me-1"></i> Manage Certificate Settings
+                        </a>
                         @endif
                     </div>
                 </div>
@@ -132,9 +180,119 @@
 
 @push('scripts')
 <script>
-    // The main theme system is now handled by the centralized theme manager in master.blade.php
-    // This script just adds some additional preview functionality for the profile page
+    // SSL Certificate Status Functions
+    function refreshSSLStatus() {
+        const statusContent = document.getElementById('ssl-status-content');
+        statusContent.innerHTML = `
+            <div class="text-center">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="mt-2">Checking SSL certificate...</p>
+            </div>
+        `;
+        
+        fetch('{{ route("cert.info") }}')
+            .then(response => response.json())
+            .then(data => {
+                displaySSLStatus(data);
+            })
+            .catch(error => {
+                statusContent.innerHTML = `
+                    <div class="alert alert-danger">
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        <strong>Error:</strong> Unable to fetch certificate information.
+                    </div>
+                `;
+            });
+    }
+    
+    function displaySSLStatus(certData) {
+        const statusContent = document.getElementById('ssl-status-content');
+        
+        if (certData.SSL_CLIENT_VERIFY === 'SUCCESS') {
+            // Certificate is present and valid
+            statusContent.innerHTML = `
+                <div class="alert alert-success">
+                    <i class="bi bi-shield-check me-2"></i>
+                    <strong>SSL Certificate Active</strong>
+                </div>
+                
+                <table class="table table-sm">
+                    ${certData.SSL_CLIENT_S_DN_Email ? `
+                        <tr>
+                            <th width="30%">Email:</th>
+                            <td>${certData.SSL_CLIENT_S_DN_Email}</td>
+                        </tr>
+                    ` : ''}
+                    ${certData.SSL_CLIENT_S_DN_CN ? `
+                        <tr>
+                            <th>Common Name:</th>
+                            <td>${certData.SSL_CLIENT_S_DN_CN}</td>
+                        </tr>
+                    ` : ''}
+                    ${certData.SSL_CLIENT_M_SERIAL ? `
+                        <tr>
+                            <th>Serial Number:</th>
+                            <td><code>${certData.SSL_CLIENT_M_SERIAL}</code></td>
+                        </tr>
+                    ` : ''}
+                    <tr>
+                        <th>Auth Status:</th>
+                        <td>
+                            ${certData['Auth Status'].includes('Logged in') 
+                                ? '<span class="badge bg-success">Authenticated</span>' 
+                                : '<span class="badge bg-warning">Not Authenticated</span>'
+                            }
+                        </td>
+                    </tr>
+                </table>
+                
+                ${certData.SSL_CLIENT_S_DN ? `
+                    <details class="mt-3">
+                        <summary class="btn btn-outline-info btn-sm">View Full Certificate Details</summary>
+                        <div class="mt-2 p-2 bg-light rounded">
+                            <small><strong>Distinguished Name:</strong><br>
+                            <code>${certData.SSL_CLIENT_S_DN}</code></small>
+                        </div>
+                    </details>
+                ` : ''}
+            `;
+        } else if (certData.SSL_CLIENT_VERIFY) {
+            // Certificate verification failed
+            statusContent.innerHTML = `
+                <div class="alert alert-warning">
+                    <i class="bi bi-shield-exclamation me-2"></i>
+                    <strong>Certificate Verification Failed</strong>
+                    <br><small>Status: ${certData.SSL_CLIENT_VERIFY}</small>
+                </div>
+                <p class="text-muted">Your certificate could not be verified. Please check that it's valid and issued by a trusted authority.</p>
+            `;
+        } else {
+            // No certificate presented
+            statusContent.innerHTML = `
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle me-2"></i>
+                    <strong>No SSL Certificate Detected</strong>
+                </div>
+                <p class="text-muted">No client certificate is currently being presented by your browser.</p>
+                <div class="mt-3">
+                    <h6>To use certificate authentication:</h6>
+                    <ol class="small">
+                        <li>Install a client certificate in your browser</li>
+                        <li>Configure the certificate details in your profile</li>
+                        <li>Refresh this page and select your certificate when prompted</li>
+                    </ol>
+                </div>
+            `;
+        }
+    }
+
+    // Theme management code (existing)
     document.addEventListener('DOMContentLoaded', function() {
+        // Load SSL status when page loads
+        refreshSSLStatus();
+        
         // Preview buttons should update instantly to show theme changes
         const previewPrimaryBtn = document.querySelector('.d-grid .btn-primary');
         const previewGradientBtn = document.querySelector('.d-grid .btn-gradient');
