@@ -75,6 +75,38 @@ class Product extends Model  {
     }
 
     /**
+     * Get the comments for this product.
+     */
+    public function comments()
+    {
+        return $this->hasMany(ProductComment::class)->approved()->orderBy('created_at', 'desc');
+    }
+
+    /**
+     * Get all comments for this product (including unapproved).
+     */
+    public function allComments()
+    {
+        return $this->hasMany(ProductComment::class)->orderBy('created_at', 'desc');
+    }
+
+    /**
+     * Get the average rating for this product.
+     */
+    public function getAverageRating()
+    {
+        return $this->comments()->avg('rating') ?: 0;
+    }
+
+    /**
+     * Get the total number of reviews for this product.
+     */
+    public function getReviewCount()
+    {
+        return $this->comments()->count();
+    }
+
+    /**
      * Get the main photo URL
      */
     public function getMainPhotoUrl()
