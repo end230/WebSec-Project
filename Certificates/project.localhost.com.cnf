@@ -1,0 +1,15 @@
+[req]
+prompt = no
+distinguished_name = dn
+req_extensions = v3_req
+[dn]
+C=EG
+ST=Cairo
+L=Cairo
+O=WebSec Course
+OU=WebSec Service
+CN=project.localhost.com
+[v3_req]
+basicConstraints = CA:FALSE
+keyUsage = digitalSignature, keyEncipherment
+subjectAltName = DNS:project.localhost.com
