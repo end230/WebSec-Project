@@ -18,6 +18,8 @@ use Laravel\Socialite\Facades\Socialite;
 use Illuminate\Support\Str; // Add this import for Str class
 use Illuminate\Support\Facades\Schema; // Add missing import for Schema
 use Illuminate\Support\Facades\Log; // Add missing import for Log
+use Illuminate\Support\Facades\Password as FacadesPassword;
+use Illuminate\Auth\Events\PasswordReset;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
@@ -689,5 +691,118 @@ class UsersController extends Controller {
 
         return redirect()->route('users.edit', $user->id)
             ->with('success', 'User updated successfully.');
+    }
+
+    /**
+     * Show the form for requesting a password reset link.
+     */
+    public function showForgotPasswordForm()
+    {
+        return view('users.forgot-password');
+    }
+
+    /**
+     * Send a password reset link to the given user.
+     */
+    public function sendResetLinkEmail(Request $request)
+    {
+        $request->validate(['email' => 'required|email']);
+
+        // Create a password reset token
+        $token = Str::random(64);
+        
+        // Delete any existing tokens for this user
+        DBFacade::table('password_resets')->where('email', $request->email)->delete();
+        
+        // Insert new token
+        DBFacade::table('password_resets')->insert([
+            'email' => $request->email,
+            'token' => $token,
+            'created_at' => Carbon::now()
+        ]);
+        
+        // Get the user
+        $user = User::where('email', $request->email)->first();
+        
+        if (!$user) {
+            // Don't reveal that the user doesn't exist
+            return back()->with('status', 'We have emailed your password reset link!');
+        }
+        
+        // Create reset URL
+        $resetUrl = route('password.reset', ['token' => $token]);
+        
+        // Send the password reset email
+        try {
+            Mail::send(
+                ['html' => 'emails.password-reset', 'text' => 'emails.password-reset-plain'],
+                ['resetUrl' => $resetUrl, 'user' => $user],
+                function($message) use ($user) {
+                    $message->to($user->email);
+                    $message->subject('Reset Your Password');
+                }
+            );
+            
+            Log::info("Password reset email sent to: {$user->email}");
+            return back()->with('status', 'We have emailed your password reset link!');
+        } catch (\Exception $e) {
+            Log::error("Failed to send password reset email: " . $e->getMessage());
+            return back()->withErrors(['email' => 'Could not send reset link. Please try again later.']);
+        }
+    }
+
+    /**
+     * Display the password reset view for the given token.
+     */
+    public function showResetForm(Request $request, $token)
+    {
+        return view('users.reset-password', ['token' => $token]);
+    }
+
+    /**
+     * Reset the given user's password.
+     */
+    public function resetPassword(Request $request)
+    {
+        $request->validate([
+            'token' => 'required',
+            'email' => 'required|email',
+            'password' => ['required', 'confirmed', Password::min(8)->numbers()->letters()->mixedCase()->symbols()],
+        ]);
+
+        // Check if token exists and is valid
+        $passwordReset = DBFacade::table('password_resets')
+            ->where('email', $request->email)
+            ->where('token', $request->token)
+            ->first();
+            
+        if (!$passwordReset) {
+            return back()->withErrors(['email' => 'Invalid or expired token.']);
+        }
+        
+        // Check if token is expired (tokens valid for 60 minutes)
+        if (Carbon::parse($passwordReset->created_at)->addMinutes(60)->isPast()) {
+            DBFacade::table('password_resets')->where('email', $request->email)->delete();
+            return back()->withErrors(['email' => 'Password reset token has expired.']);
+        }
+
+        // Find the user
+        $user = User::where('email', $request->email)->first();
+        
+        if (!$user) {
+            return back()->withErrors(['email' => 'We cannot find a user with that email address.']);
+        }
+
+        // Update the password
+        $user->password = Hash::make($request->password);
+        $user->save();
+        
+        // Delete the token
+        DBFacade::table('password_resets')->where('email', $request->email)->delete();
+        
+        // Log the user in
+        Auth::login($user);
+        
+        return redirect('/')->with('status', 'Your password has been reset!');
     }
 }
