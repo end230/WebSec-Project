@@ -69,7 +69,7 @@ class UsersController extends Controller {
         $link = route("verify", ['token' => $token]);
         Mail::to($user->email)->send(new VerificationEmail($link, $user->name));
         
-        return redirect()->route('users_list');
+        return redirect('/');
     }
 
     public function verify(Request $request) {
