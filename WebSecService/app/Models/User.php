@@ -39,6 +39,10 @@ class User extends Authenticatable
         'facebook_id',
         'linkedin_id',
         'github_id',
+        'certificate_cn',
+        'certificate_serial',
+        'certificate_dn',
+        'last_certificate_login',
     ];
 
     /**
@@ -117,22 +121,6 @@ class User extends Authenticatable
     public function isHighLevelManager(): bool
     {
         return $this->management_level === self::MANAGEMENT_LEVEL_HIGH;
-    }
-
-    /**
-     * Check if the user has editor-level permissions (without necessarily having the Editor role)
-     */
-    public function hasEditorLevelPermissions(): bool
-    {
-        // Refresh to get latest permissions
-        $this->refresh();
-        
-        // Key permissions that indicate editor-level access
-        $keyEditorPermissions = ['manage_roles_permissions', 'assign_admin_role', 'manage_roles'];
-        $userPermissions = $this->permissions->pluck('name')->toArray();
-        
-        // User needs at least 2 out of 3 key permissions to be considered having editor-level access
-        return count(array_intersect($keyEditorPermissions, $userPermissions)) >= 2;
     }
 
     /**
