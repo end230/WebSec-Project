@@ -9,6 +9,7 @@ return new class extends Migration
     public function up()
     {
         Schema::table('users', function (Blueprint $table) {
+            $table->string('certificate_cn')->nullable();
             $table->string('certificate_serial')->nullable();
             $table->text('certificate_dn')->nullable();
             $table->timestamp('last_certificate_login')->nullable();
@@ -18,6 +19,7 @@ return new class extends Migration
     public function down()
     {
         Schema::table('users', function (Blueprint $table) {
+            $table->dropColumn('certificate_cn');
             $table->dropColumn('certificate_serial');
             $table->dropColumn('certificate_dn');
             $table->dropColumn('last_certificate_login');
