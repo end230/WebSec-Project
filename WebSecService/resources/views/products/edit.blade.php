@@ -65,8 +65,13 @@
                     <input type="file" class="form-control" name="main_photo" accept="image/*">
                     @if($product->main_photo || $product->photo)
                         <div class="mt-2">
-                            <p>Current Photo:</p>
-                            <img src="{{ $product->getMainPhotoUrl() }}" alt="{{ $product->name }}" class="img-thumbnail" style="max-height: 150px;">
+                            <div class="d-flex align-items-center gap-2">
+                                <img src="{{ $product->getMainPhotoUrl() }}" alt="{{ $product->name }}" class="img-thumbnail" style="max-height: 150px;">
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input" name="remove_main_photo" id="remove_main_photo" value="1">
+                                    <label class="form-check-label" for="remove_main_photo">Remove photo</label>
+                                </div>
+                            </div>
                         </div>
                     @endif
                 </div>
@@ -77,8 +82,16 @@
                         <div class="mt-2">
                             <p>Current Additional Photos:</p>
                             <div class="d-flex flex-wrap gap-2">
-                                @foreach($product->additional_photos as $photo)
-                                    <img src="{{ asset('storage/products/' . $photo) }}" alt="Additional photo" class="img-thumbnail" style="max-height: 100px;">
+                                @foreach($product->additional_photos as $index => $photo)
+                                    <div class="position-relative">
+                                        <img src="{{ asset('storage/products/' . $photo) }}" alt="Additional photo" class="img-thumbnail" style="max-height: 100px;">
+                                        <div class="form-check position-absolute top-0 end-0 m-1">
+                                            <input type="checkbox" class="form-check-input" name="remove_additional_photos[]" value="{{ $photo }}" id="remove_photo_{{ $index }}">
+                                            <label class="form-check-label" for="remove_photo_{{ $index }}">
+                                                <i class="bi bi-x-circle text-danger"></i>
+                                            </label>
+                                        </div>
+                                    </div>
                                 @endforeach
                             </div>
                         </div>

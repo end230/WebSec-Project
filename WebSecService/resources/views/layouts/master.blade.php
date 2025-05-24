@@ -51,37 +51,203 @@
         /* Base theme (Light) */
         :root {
             /* Core colors */
-            --primary-color: #4a6cf7;
-            --secondary-color: #6c757d;
-            --success-color: #28a745;
+            --primary-color: #2F5233;
+            --secondary-color: #8B4513;
+            --success-color: #9CAF88;
             --danger-color: #dc3545;
-            --warning-color: #ffc107;
+            --warning-color: #DAA520;
             --info-color: #17a2b8;
-            --light-color: #f8f9fa;
-            --dark-color: #343a40;
-            --body-bg: #ffffff;
-            --text-color: #212529;
-            --border-color: #dee2e6;
-            --card-bg: #ffffff;
-            --scrollbar-track: #f1f1f1;
-            --scrollbar-thumb: #4a6cf7;
+            --light-color: #FFFDD0;
+            --dark-color: #3E2723;
+            --body-bg: #FFFDD0;
+            --text-color: #2F5233;
+            --border-color: #9CAF88;
+            --card-bg: #FFFDD0;
+            --scrollbar-track: #E8E8E8;
+            --scrollbar-thumb: #2F5233;
             
             /* Theme specific accent colors */
-            --theme-primary: #4a6cf7;
-            --theme-secondary: #6c757d;
-            --theme-accent: #5c7cfa;
-            --theme-gradient-start: #4a6cf7;
-            --theme-gradient-end: #6384ff;
+            --theme-primary: #2F5233;
+            --theme-secondary: #8B4513;
+            --theme-accent: #9CAF88;
+            --theme-gradient-start: #2F5233;
+            --theme-gradient-end: #9CAF88;
+            
+            /* Animation durations */
+            --animation-slow: 2s;
+            --animation-medium: 1s;
+            --animation-fast: 0.3s;
+        }
+
+        /* Reduced motion preferences */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+            }
+        }
+
+        /* Shared animations */
+        @keyframes floatingLeaf {
+            0%, 100% {
+                transform: translateY(0) rotate(0);
+            }
+            50% {
+                transform: translateY(-10px) rotate(5deg);
+            }
+        }
+
+        @keyframes steamRise {
+            0% {
+                transform: translateY(0) translateX(-50%) scale(1);
+                opacity: 0;
+            }
+            50% {
+                opacity: 0.5;
+                transform: translateY(-10px) translateX(-50%) scale(1.2);
+            }
+            100% {
+                transform: translateY(-20px) translateX(-50%) scale(1.4);
+                opacity: 0;
+            }
+        }
+
+        @keyframes rippleEffect {
+            0% {
+                box-shadow: 0 0 0 0 rgba(47, 82, 51, 0.2);
+            }
+            100% {
+                box-shadow: 0 0 0 20px rgba(47, 82, 51, 0);
+            }
+        }
+
+        /* Organic shapes */
+        .organic-shape {
+            position: absolute;
+            border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+            background: var(--theme-accent);
+            opacity: 0.1;
+            z-index: -1;
+            transition: all var(--animation-medium) ease-in-out;
+        }
+
+        /* Form styling */
+        .form-control {
+            border-radius: 20px;
+            border: 2px solid var(--border-color);
+            padding: 0.75rem 1rem;
+            transition: all var(--animation-fast) ease;
+            background-color: rgba(255, 253, 208, 0.9);
+        }
+
+        .form-control:focus {
+            border-color: var(--theme-primary);
+            box-shadow: 0 0 0 0.2rem rgba(47, 82, 51, 0.25);
+            animation: rippleEffect var(--animation-medium) ease-out;
+        }
+
+        /* Interactive elements */
+        .btn {
+            border-radius: 25px;
+            padding: 0.75rem 1.5rem;
+            transition: all var(--animation-fast) ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 300%;
+            height: 300%;
+            background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 70%);
+            transform: translate(-50%, -50%) scale(0);
+            opacity: 0;
+            transition: transform var(--animation-fast) ease-out, opacity var(--animation-fast) ease-out;
+        }
+
+        .btn:hover::after {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+        }
+
+        /* Card styling */
+        .card {
+            border-radius: 20px;
+            border: none;
+            background: rgba(255, 253, 208, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(47, 82, 51, 0.1);
+            transition: all var(--animation-fast) ease;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 48px rgba(47, 82, 51, 0.15);
+        }
+
+        /* Loading indicator */
+        .loading-indicator {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            align-items: center;
+            height: 40px;
+        }
+
+        .loading-indicator .steam {
+            width: 6px;
+            height: 30px;
+            background: linear-gradient(to bottom, transparent, var(--theme-primary));
+            border-radius: 3px;
+            animation: steamRise var(--animation-slow) infinite;
+        }
+
+        .loading-indicator .steam:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .loading-indicator .steam:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        /* Parallax container */
+        .parallax-container {
+            perspective: 1000px;
+            overflow-x: hidden;
+        }
+
+        .parallax-element {
+            transform-style: preserve-3d;
+            will-change: transform;
+        }
+
+        /* Accessibility focus styles */
+        :focus-visible {
+            outline: 3px solid var(--theme-primary);
+            outline-offset: 2px;
+        }
+
+        /* Responsive typography */
+        @media (max-width: 768px) {
+            :root {
+                font-size: 14px;
+            }
         }
 
         /* Dark mode variables */
         [data-theme="dark"] {
             --body-bg: #1a1d20;
-            --text-color: #f8f9fa;
-            --border-color: #495057;
+            --text-color: #FFFAF0;
+            --border-color: #9CAF88;
             --card-bg: #2a2e33;
-            --light-color: #3c4349;
-            --dark-color: #f8f9fa;
+            --light-color: #E8E8E8;
+            --dark-color: #FFFAF0;
             --scrollbar-track: #2a2e33;
         }
         
@@ -526,6 +692,24 @@
             font-size: 1.5rem;
             color: var(--text-color);
         }
+
+        /* Tea-themed animations */
+        @keyframes leafFall {
+            0% {
+                transform: translateY(-20px) rotate(0deg);
+                opacity: 0;
+            }
+            50% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        @keyframes ripple {
+            0% {
     </style>
 </head>
 <body>

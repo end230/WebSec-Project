@@ -1,10 +1,12 @@
 @extends('layouts.master')
 @section('title', 'Order Confirmation')
+@include('layouts.admin-theme')
+
 @section('content')
 <div class="container py-5">
     <div class="checkout-progress mb-5 animate__animated animate__fadeIn" data-aos="fade-up">
         <div class="progress" style="height: 4px;">
-            <div class="progress-bar bg-success" role="progressbar" style="width: 100%;" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+            <div class="progress-bar bg-tea" role="progressbar" style="width: 100%;" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
         </div>
         <div class="d-flex justify-content-between mt-2">
             <div class="progress-step completed">
@@ -23,51 +25,54 @@
     </div>
 
     <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <div class="card border-0 shadow-sm mb-4 animate__animated animate__fadeInUp">
-                <div class="card-body text-center p-5">
-                    <div class="success-animation mb-4">
-                        <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
-                            <circle class="checkmark__circle" cx="26" cy="26" r="25" fill="none"/>
-                            <path class="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
-                        </svg>
+        <div class="col-md-8">
+            <div class="tea-admin-card animate__animated animate__fadeIn">
+                <div class="tea-steam">
+                    @for($i = 1; $i <= 3; $i++)
+                        <div class="steam" style="--delay: {{ $i * 0.2 }}s"></div>
+                    @endfor
+                </div>
+                <div class="card-header text-center">
+                    <div class="mb-3">
+                        <i class="bi bi-check-circle-fill text-tea" style="font-size: 3rem;"></i>
                     </div>
+                    <h2 class="mb-0 text-tea-800">Order Confirmed!</h2>
+                    <p class="text-tea-600 mt-2">Thank you for your order. We'll start processing it right away.</p>
+                </div>
 
-                    <h1 class="display-4 mb-3 fw-bold text-success">Thank You!</h1>
-                    <p class="lead mb-4">Your order has been placed successfully.</p>
-
+                <div class="card-body">
                     <div class="order-details mb-4 animate__animated animate__fadeIn animate__delay-1s">
-                        <h5 class="text-muted mb-3">Order Details</h5>
+                        <h5 class="text-tea-700 mb-3">Order Details</h5>
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <div class="card bg-light border-0">
+                                <div class="tea-info-card">
                                     <div class="card-body">
-                                        <h6 class="card-title"><i class="bi bi-receipt me-2"></i>Order Number</h6>
-                                        <p class="card-text fw-bold">{{ $order->id ?? '#'.rand(10000, 99999) }}</p>
+                                        <h6 class="card-title text-tea-700"><i class="bi bi-receipt me-2"></i>Order Number</h6>
+                                        <p class="card-text text-tea-800 fw-bold">{{ $order->id ?? '#'.rand(10000, 99999) }}</p>
                                     </div>
                                 </div>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <div class="card bg-light border-0">
+                                <div class="tea-info-card">
                                     <div class="card-body">
-                                        <h6 class="card-title"><i class="bi bi-calendar me-2"></i>Order Date</h6>
-                                        <p class="card-text fw-bold">{{ isset($order->created_at) ? $order->created_at->format('M d, Y') : date('M d, Y') }}</p>
+                                        <h6 class="card-title text-tea-700"><i class="bi bi-calendar me-2"></i>Order Date</h6>
+                                        <p class="card-text text-tea-800 fw-bold">{{ isset($order->created_at) ? $order->created_at->format('M d, Y') : date('M d, Y') }}</p>
                                     </div>
                                 </div>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <div class="card bg-light border-0">
+                                <div class="tea-info-card">
                                     <div class="card-body">
-                                        <h6 class="card-title"><i class="bi bi-credit-card me-2"></i>Payment Method</h6>
-                                        <p class="card-text fw-bold">Credits</p>
+                                        <h6 class="card-title text-tea-700"><i class="bi bi-credit-card me-2"></i>Payment Method</h6>
+                                        <p class="card-text text-tea-800 fw-bold">Credits</p>
                                     </div>
                                 </div>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <div class="card bg-light border-0">
+                                <div class="tea-info-card">
                                     <div class="card-body">
-                                        <h6 class="card-title"><i class="bi bi-truck me-2"></i>Shipping Method</h6>
-                                        <p class="card-text fw-bold">Standard Shipping</p>
+                                        <h6 class="card-title text-tea-700"><i class="bi bi-truck me-2"></i>Shipping Method</h6>
+                                        <p class="card-text text-tea-800 fw-bold">Standard Shipping</p>
                                     </div>
                                 </div>
                             </div>
@@ -75,19 +80,19 @@
                     </div>
 
                     <div class="shipping-info mb-4 animate__animated animate__fadeIn animate__delay-2s">
-                        <h5 class="text-muted mb-3">Shipping Information</h5>
-                        <div class="card bg-light border-0">
+                        <h5 class="text-tea-700 mb-3">Shipping Information</h5>
+                        <div class="tea-info-card">
                             <div class="card-body">
-                                <p class="mb-0">{{ $order->shipping_address ?? '123 Main Street, Apt 4B, New York, NY 10001' }}</p>
+                                <p class="mb-0 text-tea-800">{{ $order->shipping_address ?? '123 Main Street, Apt 4B, New York, NY 10001' }}</p>
                             </div>
                         </div>
                     </div>
 
                     <div class="order-summary animate__animated animate__fadeIn animate__delay-3s">
-                        <h5 class="text-muted mb-3">Order Summary</h5>
+                        <h5 class="text-tea-700 mb-3">Order Summary</h5>
                         <div class="table-responsive">
-                            <table class="table">
-                                <thead class="table-light">
+                            <table class="table tea-table">
+                                <thead>
                                     <tr>
                                         <th>Product</th>
                                         <th>Quantity</th>
@@ -98,24 +103,14 @@
                                     @if(isset($order) && isset($order->items))
                                         @foreach($order->items as $item)
                                             <tr>
-                                                <td>{{ $item->product->name }}</td>
-                                                <td>{{ $item->quantity }}</td>
-                                                <td class="text-end">${{ number_format($item->price, 2) }}</td>
+                                                <td class="text-tea-800">{{ $item->product->name }}</td>
+                                                <td class="text-tea-700">{{ $item->quantity }}</td>
+                                                <td class="text-end text-tea-700">${{ number_format($item->price, 2) }}</td>
                                             </tr>
                                         @endforeach
-                                        <tr class="border-top">
-                                            <td colspan="2" class="text-end fw-bold">Total:</td>
-                                            <td class="text-end fw-bold">${{ number_format($order->total, 2) }}</td>
-                                        </tr>
-                                    @else
-                                        <tr>
-                                            <td>Product Example</td>
-                                            <td>2</td>
-                                            <td class="text-end">$24.99</td>
-                                        </tr>
-                                        <tr class="border-top">
-                                            <td colspan="2" class="text-end fw-bold">Total:</td>
-                                            <td class="text-end fw-bold">$49.98</td>
+                                        <tr class="border-top border-tea-200">
+                                            <td colspan="2" class="text-end fw-bold text-tea-800">Total:</td>
+                                            <td class="text-end fw-bold text-tea-800">${{ number_format($order->total, 2) }}</td>
                                         </tr>
                                     @endif
                                 </tbody>
@@ -123,106 +118,157 @@
                         </div>
                     </div>
 
-                    <div class="mt-5 animate__animated animate__fadeIn animate__delay-3s">
-                        <a href="{{ route('products_list') }}" class="btn btn-primary btn-lg me-2">
-                            <i class="bi bi-shop me-2"></i>Continue Shopping
+                    <div class="text-center mt-4">
+                        <a href="{{ route('orders.index') }}" class="tea-btn tea-btn-primary">
+                            <i class="bi bi-list-ul me-1"></i> View All Orders
                         </a>
-                        <a href="#" class="btn btn-outline-secondary btn-lg">
-                            <i class="bi bi-download me-2"></i>Download Receipt
+                        <a href="{{ route('products_list') }}" class="tea-btn tea-btn-secondary ms-2">
+                            <i class="bi bi-cart-plus me-1"></i> Continue Shopping
                         </a>
                     </div>
                 </div>
-            </div>
-
-            <div class="text-center animate__animated animate__fadeIn animate__delay-4s">
-                <p class="text-muted">
-                    <i class="bi bi-envelope me-1"></i> A confirmation email has been sent to your email address.
-                </p>
-                <p class="text-muted">
-                    <i class="bi bi-question-circle me-1"></i>
-                    Have questions about your order? <a href="#">Contact our support</a>
-                </p>
             </div>
         </div>
     </div>
 </div>
 
-@push('styles')
 <style>
-    /* Progress steps styling */
-    .checkout-progress {
-        margin-bottom: 2rem;
-    }
-    .progress-step {
-        text-align: center;
-        width: 33.333%;
-        position: relative;
-    }
-    .step-icon {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 30px;
-        height: 30px;
-        background-color: #e9ecef;
-        border-radius: 50%;
-        margin-bottom: 5px;
-    }
-    .progress-step.completed .step-icon {
-        background-color: #28a745;
-        color: white;
-    }
+.text-tea {
+    color: var(--tea-green-600);
+}
 
-    /* Checkmark animation */
-    .success-animation {
-        margin: 0 auto;
+.text-tea-600 {
+    color: var(--tea-green-600);
+}
+
+.text-tea-700 {
+    color: var(--tea-green-700);
+}
+
+.text-tea-800 {
+    color: var(--tea-green-800);
+}
+
+.bg-tea {
+    background-color: var(--tea-green-500);
+}
+
+.tea-info-card {
+    background-color: var(--tea-green-50);
+    border-radius: 0.5rem;
+    border: 1px solid var(--tea-green-100);
+    transition: all 0.2s;
+}
+
+.tea-info-card:hover {
+    border-color: var(--tea-green-200);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.tea-table thead {
+    background-color: var(--tea-green-50);
+}
+
+.tea-table th {
+    color: var(--tea-green-700);
+    font-weight: 600;
+    border-bottom-color: var(--tea-green-200);
+}
+
+.border-tea-200 {
+    border-color: var(--tea-green-200);
+}
+
+.tea-steam {
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 30px;
+    overflow: hidden;
+    opacity: 0.7;
+}
+
+.steam {
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    width: 2px;
+    height: 15px;
+    background: var(--tea-green-200);
+    border-radius: 10px;
+    animation: steam 2s infinite;
+    transform-origin: bottom;
+    opacity: 0;
+}
+
+.steam:nth-child(1) {
+    left: 25%;
+    animation-delay: var(--delay);
+}
+
+.steam:nth-child(2) {
+    left: 50%;
+    animation-delay: calc(var(--delay) + 0.3s);
+}
+
+.steam:nth-child(3) {
+    left: 75%;
+    animation-delay: calc(var(--delay) + 0.6s);
+}
+
+@keyframes steam {
+    0% {
+        transform: translateY(0) scaleX(1);
+        opacity: 0;
     }
-    .checkmark {
-        width: 80px;
-        height: 80px;
-        border-radius: 50%;
-        display: block;
-        stroke-width: 2;
-        stroke: #4bb71b;
-        stroke-miterlimit: 10;
-        box-shadow: inset 0px 0px 0px #4bb71b;
-        animation: fill .4s ease-in-out .4s forwards, scale .3s ease-in-out .9s both;
-        position: relative;
-        margin: 0 auto;
+    15% {
+        opacity: 1;
     }
-    .checkmark__circle {
-        stroke-dasharray: 166;
-        stroke-dashoffset: 166;
-        stroke-width: 2;
-        stroke-miterlimit: 10;
-        stroke: #4bb71b;
-        fill: none;
-        animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+    50% {
+        transform: translateY(-10px) scaleX(3);
     }
-    .checkmark__check {
-        transform-origin: 50% 50%;
-        stroke-dasharray: 48;
-        stroke-dashoffset: 48;
-        animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards;
+    95% {
+        opacity: 0;
     }
-    @keyframes stroke {
-        100% {
-            stroke-dashoffset: 0;
-        }
+    100% {
+        transform: translateY(-20px) scaleX(4);
+        opacity: 0;
     }
-    @keyframes scale {
-        0%, 100% {
-            transform: none;
-        }
-        50% {
-            transform: scale3d(1.1, 1.1, 1);
-        }
-    }
-    @keyframes fill {
-        100% {
-            box-shadow: inset 0px 0px 0px 30px #4bb71b;
-        }
-    }
+}
+
+.progress-step {
+    text-align: center;
+    flex: 1;
+    position: relative;
+}
+
+.step-icon {
+    width: 40px;
+    height: 40px;
+    background: var(--tea-green-100);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 0.5rem;
+    color: var(--tea-green-600);
+}
+
+.progress-step.completed .step-icon {
+    background: var(--tea-green-600);
+    color: white;
+}
+
+.step-label {
+    color: var(--tea-green-700);
+    font-size: 0.9rem;
+}
+
+.progress-step.completed .step-label {
+    color: var(--tea-green-800);
+    font-weight: 600;
+}
 </style>
-@endpush
 @endsection

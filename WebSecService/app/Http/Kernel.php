@@ -67,5 +67,9 @@ class Kernel extends HttpKernel
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'employee.feedback' => \App\Http\Middleware\EmployeeFeedbackNotifier::class,
         'management' => \App\Http\Middleware\CheckManagementLevel::class,
+        'role' => \Spatie\Permission\Middlewares\RoleMiddleware::class,
+        'permission' => \Spatie\Permission\Middlewares\PermissionMiddleware::class,
+        'role_or_permission' => \Spatie\Permission\Middlewares\RoleOrPermissionMiddleware::class,
+        'customer' => \App\Http\Middleware\EnsureCustomerRole::class,
     ];
 }

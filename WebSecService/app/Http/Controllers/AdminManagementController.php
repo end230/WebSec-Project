@@ -19,7 +19,7 @@ class AdminManagementController extends Controller
      */
     public function index()
     {
-        $admins = User::role('Admin')->get();
+        $admins = User::role('Admin')->paginate(10);
         
         // Check which admins have Editor permissions
         $editorRole = Role::findByName('Editor');

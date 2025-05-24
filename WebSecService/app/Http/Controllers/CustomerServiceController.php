@@ -14,7 +14,8 @@ class CustomerServiceController extends Controller
 {
     public function __construct()
     {
-        $this->middleware(['auth', 'permission:view_customer_feedback']);
+        $this->middleware(['auth']);
+        $this->middleware(['permission:view_customer_feedback|manage_users|admin_users']);
     }
 
     /**
@@ -23,25 +24,31 @@ class CustomerServiceController extends Controller
     public function dashboard()
     {
         $user = Auth::user();
+        $isAdmin = $user->hasAnyPermission(['manage_users', 'admin_users']);
         
         // Get dashboard statistics
         $stats = [
             'total_cases' => CustomerServiceCase::count(),
             'open_cases' => CustomerServiceCase::where('status', 'open')->count(),
-            'my_cases' => CustomerServiceCase::where('assigned_to', $user->id)->count(),
+            'my_cases' => $isAdmin ? CustomerServiceCase::count() : CustomerServiceCase::where('assigned_to', $user->id)->count(),
             'overdue_cases' => CustomerServiceCase::overdue()->count(),
             'urgent_cases' => CustomerServiceCase::where('priority', 'urgent')
                 ->whereNotIn('status', ['resolved', 'closed'])->count(),
+            'resolved_cases' => CustomerServiceCase::whereIn('status', ['resolved', 'closed'])->count(),
             'avg_response_time' => CustomerServiceCase::whereNotNull('response_time_hours')
                 ->avg('response_time_hours'),
             'avg_resolution_time' => CustomerServiceCase::whereNotNull('resolution_time_hours')
                 ->avg('resolution_time_hours'),
+            'cases_handled' => $isAdmin ? CustomerServiceCase::count() : CustomerServiceCase::where('assigned_to', $user->id)->count(),
+            'resolution_rate' => $this->calculateResolutionRate($user->id, $isAdmin),
         ];
 
-        // Recent cases assigned to current user
-        $myCases = CustomerServiceCase::with(['customer', 'product', 'productComment'])
-            ->where('assigned_to', $user->id)
-            ->orderBy('created_at', 'desc')
+        // Recent cases - show all for admin, only assigned for CS
+        $casesQuery = CustomerServiceCase::with(['customer', 'product', 'productComment']);
+        if (!$isAdmin) {
+            $casesQuery->where('assigned_to', $user->id);
+        }
+        $myCases = $casesQuery->orderBy('created_at', 'desc')
             ->limit(5)
             ->get();
 
@@ -64,6 +71,23 @@ class CustomerServiceController extends Controller
         return view('customer-service.dashboard', compact(
             'stats', 'myCases', 'unassignedCases', 'recentLowRatedComments'
         ));
+    }
+
+    /**
+     * Calculate resolution rate for a user
+     */
+    private function calculateResolutionRate($userId, $isAdmin)
+    {
+        $totalCases = $isAdmin ? CustomerServiceCase::count() : CustomerServiceCase::where('assigned_to', $userId)->count();
+        if ($totalCases === 0) {
+            return '0%';
+        }
+        
+        $resolvedCases = CustomerServiceCase::where('assigned_to', $userId)
+            ->whereIn('status', ['resolved', 'closed'])
+            ->count();
+            
+        return round(($resolvedCases / $totalCases) * 100) . '%';
     }
 
     /**
