@@ -7,12 +7,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Log;
+use Laravel\Passport\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 
 
 class User extends Authenticatable
 {
-    use HasRoles;
+    use HasApiTokens, HasRoles;
 
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
@@ -53,6 +54,12 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+        'google_id',
+        'facebook_id',
+        'linkedin_id',
+        'github_id',
+        'certificate_serial',
+        'certificate_dn',
     ];
 
     /**
@@ -67,6 +74,7 @@ class User extends Authenticatable
             'password' => 'hashed',
             'credits' => 'decimal:2',
             'theme_dark_mode' => 'boolean',
+            'last_certificate_login' => 'datetime',
         ];
     }
 
