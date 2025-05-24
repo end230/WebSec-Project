@@ -53,7 +53,7 @@
                         </div>
                     @endif
                 </div>
-                </div>
+            </div>
 
                 <!-- Product Info -->
                 <div class="col-lg-6">
@@ -62,7 +62,7 @@
                         <div class="product-meta">
                             <span class="product-code">Code: {{ $product->code }}</span>
                             <span class="product-model">Model: {{ $product->model }}</span>
-                        </div>
+                </div>
 
                         <div class="product-rating mt-3">
                             @php
@@ -80,7 +80,7 @@
                                 <span class="rating-count">({{ $reviewCount }} reviews)</span>
                             </div>
                         </div>
-
+                    
                         <div class="product-price mt-4">
                             <span class="price">${{ number_format($product->price, 2) }}</span>
                             @if($product->isInStock())
@@ -118,7 +118,7 @@
                                 <a href="{{ route('login') }}" class="btn btn-outline-success">
                                     <i class="bi bi-box-arrow-in-right"></i> Login to Purchase
                                 </a>
-                            </div>
+                        </div>
                         @endauth
             </div>
         </div>
@@ -545,19 +545,19 @@
 @media (max-width: 768px) {
     .product-details-card {
         padding: 1rem;
-    }
+}
 
     .product-title {
     font-size: 1.5rem;
-    }
+}
 
     .product-price {
         font-size: 1.5rem;
-    }
+}
 
     .product-actions {
         flex-direction: column;
-    }
+}
 
     .quantity-control {
         margin-bottom: 1rem;

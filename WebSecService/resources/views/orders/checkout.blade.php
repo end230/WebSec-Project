@@ -174,36 +174,36 @@
 </div>
 
 <style>
-.checkout-progress {
-    margin-bottom: 2rem;
-}
+    .checkout-progress {
+        margin-bottom: 2rem;
+    }
 
-.progress-step {
-    text-align: center;
+    .progress-step {
+        text-align: center;
     flex: 1;
-    position: relative;
-}
+        position: relative;
+    }
 
-.step-icon {
+    .step-icon {
     width: 40px;
     height: 40px;
     background: var(--tea-green-100);
     border-radius: 50%;
     display: flex;
-    align-items: center;
-    justify-content: center;
+        align-items: center;
+        justify-content: center;
     margin: 0 auto 0.5rem;
     color: var(--tea-green-600);
 }
 
-.progress-step.completed .step-icon {
+    .progress-step.completed .step-icon {
     background: var(--tea-green-600);
-    color: white;
-}
+        color: white;
+    }
 
-.progress-step.active .step-icon {
+    .progress-step.active .step-icon {
     background: var(--tea-green-500);
-    color: white;
+        color: white;
     animation: pulse 2s infinite;
 }
 
@@ -372,17 +372,17 @@
     }
 }
 
-@keyframes pulse {
-    0% {
+    @keyframes pulse {
+        0% {
         box-shadow: 0 0 0 0 rgba(var(--tea-green-rgb), 0.4);
-    }
-    70% {
+        }
+        70% {
         box-shadow: 0 0 0 10px rgba(var(--tea-green-rgb), 0);
-    }
-    100% {
+        }
+        100% {
         box-shadow: 0 0 0 0 rgba(var(--tea-green-rgb), 0);
+        }
     }
-}
 </style>
 
 @push('scripts')

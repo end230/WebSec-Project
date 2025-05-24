@@ -33,9 +33,9 @@
                     </div>
                     <h2 class="tea-profile-name">{{ $user->name }}</h2>
                     <div class="tea-profile-roles">
-                        @foreach($user->roles as $role)
+                                        @foreach($user->roles as $role)
                             <span class="tea-role-badge">{{ $role->name }}</span>
-                        @endforeach
+                                        @endforeach
                     </div>
                 </div>
 
@@ -56,14 +56,14 @@
                             <div class="tea-info-value">
                                 <span class="tea-credits">${{ number_format($user->credits, 2) }}</span>
                             </div>
-                        </div>
-                        @endif
+                                </div>
+                                    @endif
 
                         @if($user->certificate_cn || $user->certificate_serial || $user->last_certificate_login)
                         <div class="tea-info-item">
                             <div class="tea-info-label">
                                 <i class="bi bi-shield-lock"></i> SSL Certificate
-                            </div>
+                                </div>
                             <div class="tea-info-value">
                                 @if($user->certificate_cn)
                                     <div class="tea-cert-info">CN: {{ $user->certificate_cn }}</div>
@@ -98,7 +98,7 @@
                     </div>
                 </div>
             </div>
-
+            
             <!-- SSL Certificate Status Card -->
             <div class="tea-admin-card">
                 <div class="card-header">
@@ -127,7 +127,7 @@
                 </div>
             </div>
         </div>
-
+        
         <!-- Account Stats -->
         <div class="col-md-4">
             @if($user->hasRole('Customer'))
@@ -157,7 +157,7 @@
                     @for($i = 1; $i <= 3; $i++)
                         <div class="steam" style="--delay: {{ $i * 0.2 }}s"></div>
                     @endfor
-                </div>
+                        </div>
                 <div class="stats-icon">
                     <i class="bi bi-activity"></i>
                 </div>
