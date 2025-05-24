@@ -1,266 +1,298 @@
+@php use Illuminate\Support\Str; @endphp
 @extends('layouts.master')
-
 @section('title', 'Customer Service Dashboard')
+@include('layouts.admin-theme')
 
 @section('content')
-<div class="container">
-    <div class="row">
-        <div class="col-12">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h1 class="h3 mb-0">
-                    <i class="bi bi-speedometer2 text-primary me-2"></i>
-                    Customer Service Dashboard
-                </h1>
-                <div>
-                    <a href="{{ route('customer-service.index') }}" class="btn btn-outline-primary me-2">
+<div class="container py-4">
+    <div class="tea-admin-card mb-4">
+        <div class="card-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <h3 class="mb-0">
+                    <i class="bi bi-headset me-2"></i>Customer Service Dashboard
+                </h3>
+                <div class="d-flex gap-2">
+                    <a href="{{ route('customer-service.index') }}" class="tea-btn tea-btn-primary">
                         <i class="bi bi-ticket-detailed me-1"></i> All Cases
                     </a>
-                    <a href="{{ route('customer-service.analytics') }}" class="btn btn-outline-info">
+                    <a href="{{ route('customer-service.analytics') }}" class="tea-btn tea-btn-secondary">
                         <i class="bi bi-graph-up me-1"></i> Analytics
                     </a>
                 </div>
             </div>
+            <p class="text-muted mt-2 mb-0">Welcome back, {{ auth()->user()->name }}! Here's your service overview.</p>
+        </div>
 
-            <!-- Statistics Cards -->
+        <div class="card-body">
+            <!-- Service Stats -->
             <div class="row mb-4">
-                <div class="col-md-3 mb-3">
-                    <div class="card bg-primary text-white">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between">
-                                <div>
-                                    <h6 class="card-title text-white">Total Cases</h6>
-                                    <h2 class="mb-0">{{ $stats['total_cases'] }}</h2>
-                                </div>
-                                <div class="align-self-center">
-                                    <i class="bi bi-ticket-detailed" style="font-size: 2rem;"></i>
-                                </div>
-                            </div>
+                <div class="col-md-3">
+                    <div class="tea-stats-card">
+                        <div class="tea-steam">
+                            @for($i = 1; $i <= 3; $i++)
+                                <div class="steam" style="--delay: {{ $i * 0.2 }}s"></div>
+                            @endfor
                         </div>
+                        <div class="stats-icon">
+                            <i class="bi bi-ticket"></i>
+                        </div>
+                        <div class="stats-number">{{ $stats['total_cases'] }}</div>
+                        <div class="stats-label">Total Cases</div>
                     </div>
                 </div>
-                <div class="col-md-3 mb-3">
-                    <div class="card bg-danger text-white">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between">
-                                <div>
-                                    <h6 class="card-title text-white">Open Cases</h6>
-                                    <h2 class="mb-0">{{ $stats['open_cases'] }}</h2>
-                                </div>
-                                <div class="align-self-center">
-                                    <i class="bi bi-exclamation-triangle" style="font-size: 2rem;"></i>
-                                </div>
-                            </div>
+                <div class="col-md-3">
+                    <div class="tea-stats-card">
+                        <div class="tea-steam">
+                            @for($i = 1; $i <= 3; $i++)
+                                <div class="steam" style="--delay: {{ $i * 0.2 }}s"></div>
+                            @endfor
                         </div>
+                        <div class="stats-icon">
+                            <i class="bi bi-exclamation-triangle"></i>
+                        </div>
+                        <div class="stats-number">{{ $stats['open_cases'] }}</div>
+                        <div class="stats-label">Open Cases</div>
                     </div>
                 </div>
-                <div class="col-md-3 mb-3">
-                    <div class="card bg-success text-white">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between">
-                                <div>
-                                    <h6 class="card-title text-white">My Cases</h6>
-                                    <h2 class="mb-0">{{ $stats['my_cases'] }}</h2>
-                                </div>
-                                <div class="align-self-center">
-                                    <i class="bi bi-person-check" style="font-size: 2rem;"></i>
-                                </div>
-                            </div>
+                <div class="col-md-3">
+                    <div class="tea-stats-card">
+                        <div class="tea-steam">
+                            @for($i = 1; $i <= 3; $i++)
+                                <div class="steam" style="--delay: {{ $i * 0.2 }}s"></div>
+                            @endfor
                         </div>
+                        <div class="stats-icon">
+                            <i class="bi bi-check-circle"></i>
+                        </div>
+                        <div class="stats-number">{{ $stats['resolved_cases'] }}</div>
+                        <div class="stats-label">Resolved Cases</div>
                     </div>
                 </div>
-                <div class="col-md-3 mb-3">
-                    <div class="card bg-warning text-dark">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between">
-                                <div>
-                                    <h6 class="card-title">Overdue</h6>
-                                    <h2 class="mb-0">{{ $stats['overdue_cases'] }}</h2>
-                                </div>
-                                <div class="align-self-center">
-                                    <i class="bi bi-clock-history" style="font-size: 2rem;"></i>
-                                </div>
-                            </div>
+                <div class="col-md-3">
+                    <div class="tea-stats-card">
+                        <div class="tea-steam">
+                            @for($i = 1; $i <= 3; $i++)
+                                <div class="steam" style="--delay: {{ $i * 0.2 }}s"></div>
+                            @endfor
                         </div>
+                        <div class="stats-icon">
+                            <i class="bi bi-clock-history"></i>
+                        </div>
+                        <div class="stats-number">{{ $stats['avg_response_time'] ?? '0' }}h</div>
+                        <div class="stats-label">Avg Response Time</div>
                     </div>
                 </div>
             </div>
 
-            <!-- Performance Metrics -->
-            <div class="row mb-4">
-                <div class="col-md-4 mb-3">
-                    <div class="card">
-                        <div class="card-body text-center">
-                            <i class="bi bi-lightning text-warning mb-2" style="font-size: 2rem;"></i>
-                            <h6 class="card-title">Urgent Cases</h6>
-                            <h3 class="text-warning">{{ $stats['urgent_cases'] }}</h3>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4 mb-3">
-                    <div class="card">
-                        <div class="card-body text-center">
-                            <i class="bi bi-reply text-info mb-2" style="font-size: 2rem;"></i>
-                            <h6 class="card-title">Avg Response Time</h6>
-                            <h3 class="text-info">{{ $stats['avg_response_time'] ? round($stats['avg_response_time'], 1) . 'h' : 'N/A' }}</h3>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4 mb-3">
-                    <div class="card">
-                        <div class="card-body text-center">
-                            <i class="bi bi-check-circle text-success mb-2" style="font-size: 2rem;"></i>
-                            <h6 class="card-title">Avg Resolution Time</h6>
-                            <h3 class="text-success">{{ $stats['avg_resolution_time'] ? round($stats['avg_resolution_time'], 1) . 'h' : 'N/A' }}</h3>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
+            <!-- Recent Activity -->
             <div class="row">
-                <!-- My Recent Cases -->
-                <div class="col-lg-6 mb-4">
-                    <div class="card">
+                <div class="col-md-8">
+                    <div class="tea-admin-card">
                         <div class="card-header">
-                            <h5 class="card-title mb-0">
-                                <i class="bi bi-person-check me-2"></i>My Recent Cases
-                            </h5>
+                            <h5 class="mb-0"><i class="bi bi-clock-history me-2"></i>Recent Cases</h5>
                         </div>
-                        <div class="card-body">
-                            @if($myCases->count() > 0)
-                                @foreach($myCases as $case)
-                                    <div class="d-flex justify-content-between align-items-center mb-3 pb-3 border-bottom">
-                                        <div>
-                                            <h6 class="mb-1">
-                                                <a href="{{ route('customer-service.show', $case) }}" class="text-decoration-none">
-                                                    {{ $case->case_number }}
-                                                </a>
-                                                <span class="badge {{ $case->getPriorityBadgeClass() }} ms-2">
-                                                    {{ ucfirst($case->priority) }}
-                                                </span>
-                                            </h6>
-                                            <small class="text-muted">
-                                                {{ $case->customer->name }} - {{ $case->product->name }}
-                                            </small>
-                                            <br>
-                                            <small class="text-muted">{{ $case->getTimeSinceCreation() }}</small>
-                                        </div>
-                                        <span class="badge {{ $case->getStatusBadgeClass() }}">
-                                            {{ ucwords(str_replace('_', ' ', $case->status)) }}
-                                        </span>
-                                    </div>
-                                @endforeach
-                                <a href="{{ route('customer-service.index', ['assigned_to' => 'me']) }}" class="btn btn-sm btn-outline-primary">
-                                    View All My Cases
-                                </a>
-                            @else
-                                <div class="text-center py-3">
-                                    <i class="bi bi-ticket-detailed text-muted" style="font-size: 2rem;"></i>
-                                    <p class="text-muted mt-2">No cases assigned to you yet.</p>
-                                </div>
-                            @endif
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Unassigned Cases -->
-                <div class="col-lg-6 mb-4">
-                    <div class="card">
-                        <div class="card-header">
-                            <h5 class="card-title mb-0">
-                                <i class="bi bi-person-plus me-2"></i>Unassigned Cases
-                            </h5>
-                        </div>
-                        <div class="card-body">
-                            @if($unassignedCases->count() > 0)
-                                @foreach($unassignedCases as $case)
-                                    <div class="d-flex justify-content-between align-items-center mb-3 pb-3 border-bottom">
-                                        <div>
-                                            <h6 class="mb-1">
-                                                <a href="{{ route('customer-service.show', $case) }}" class="text-decoration-none">
-                                                    {{ $case->case_number }}
-                                                </a>
-                                                <span class="badge {{ $case->getPriorityBadgeClass() }} ms-2">
-                                                    {{ ucfirst($case->priority) }}
-                                                </span>
-                                                @if($case->isOverdue())
-                                                    <i class="bi bi-exclamation-triangle text-warning ms-1" title="Overdue"></i>
-                                                @endif
-                                            </h6>
-                                            <small class="text-muted">
-                                                {{ $case->customer->name }} - {{ $case->product->name }}
-                                            </small>
-                                            <br>
-                                            <small class="text-muted">{{ $case->getTimeSinceCreation() }}</small>
-                                        </div>
-                                        <form method="POST" action="{{ route('customer-service.assign', $case) }}" class="d-inline">
-                                            @csrf
-                                            <input type="hidden" name="assigned_to" value="{{ auth()->id() }}">
-                                            <button type="submit" class="btn btn-sm btn-outline-success" title="Assign to me">
-                                                <i class="bi bi-person-plus"></i>
-                                            </button>
-                                        </form>
-                                    </div>
-                                @endforeach
-                                <a href="{{ route('customer-service.index', ['assigned_to' => 'unassigned']) }}" class="btn btn-sm btn-outline-primary">
-                                    View All Unassigned
-                                </a>
-                            @else
-                                <div class="text-center py-3">
-                                    <i class="bi bi-check-circle text-success" style="font-size: 2rem;"></i>
-                                    <p class="text-muted mt-2">All cases are assigned!</p>
-                                </div>
-                            @endif
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Recent Low-Rated Comments -->
-            @if($recentLowRatedComments->count() > 0)
-            <div class="row">
-                <div class="col-12">
-                    <div class="card">
-                        <div class="card-header">
-                            <h5 class="card-title mb-0">
-                                <i class="bi bi-chat-left-text me-2"></i>Recent Low-Rated Comments (No Case Yet)
-                            </h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                @foreach($recentLowRatedComments as $comment)
-                                    <div class="col-md-6 mb-3">
-                                        <div class="card">
-                                            <div class="card-body">
-                                                <div class="d-flex justify-content-between align-items-start">
-                                                    <div>
-                                                        <h6 class="card-title">{{ $comment->product->name }}</h6>
-                                                        <div class="mb-2">
-                                                            @for($i = 1; $i <= 5; $i++)
-                                                                @if($i <= $comment->rating)
-                                                                    <i class="bi bi-star-fill text-warning"></i>
-                                                                @else
-                                                                    <i class="bi bi-star text-muted"></i>
-                                                                @endif
-                                                            @endfor
-                                                            <span class="text-muted ms-1">({{ $comment->rating }}/5)</span>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table tea-admin-table mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>Case ID</th>
+                                            <th>Customer</th>
+                                            <th>Subject</th>
+                                            <th>Status</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @forelse($myCases as $case)
+                                        <tr>
+                                            <td>#{{ $case->id }}</td>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="me-2">
+                                                        <div class="avatar-circle" style="background: var(--tea-green-{{ ($case->id % 3 + 6) }}00)">
+                                                            {{ strtoupper(substr($case->customer->name ?? 'N/A', 0, 1)) }}
                                                         </div>
-                                                        <p class="card-text small">{{ str($comment->comment)->limit(100) }}</p>
-                                                        <small class="text-muted">
-                                                            By {{ $comment->user->name }} - {{ $comment->created_at->diffForHumans() }}
-                                                        </small>
                                                     </div>
+                                                    {{ $case->customer->name ?? 'Customer Not Found' }}
                                                 </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                @endforeach
+                                            </td>
+                                            <td>{{ Str::limit($case->subject, 30) }}</td>
+                                            <td>
+                                                @if($case->status === 'resolved')
+                                                    <span class="tea-status-badge active">
+                                                        <i class="bi bi-check-circle"></i> Resolved
+                                                    </span>
+                                                @elseif($case->status === 'pending')
+                                                    <span class="tea-status-badge pending">
+                                                        <i class="bi bi-clock"></i> Pending
+                                                    </span>
+                                                @else
+                                                    <span class="tea-status-badge inactive">
+                                                        <i class="bi bi-exclamation-circle"></i> {{ ucfirst($case->status) }}
+                                                    </span>
+                                                @endif
+                                            </td>
+                                            <td>
+                                                <a href="{{ route('customer-service.show', $case->id) }}" class="tea-btn tea-btn-primary">
+                                                    <i class="bi bi-eye"></i> View
+                                                </a>
+                                            </td>
+                                        </tr>
+                                        @empty
+                                        <tr>
+                                            <td colspan="5" class="text-center py-4">
+                                                <div class="text-muted">
+                                                    <i class="bi bi-inbox display-4"></i>
+                                                    <p class="mt-2">No recent cases found</p>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        @endforelse
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <!-- Agent Profile -->
+                    <div class="tea-profile-card mb-4">
+                        <div class="tea-profile-header">
+                            <div class="tea-profile-avatar">
+                                <div class="tea-avatar-circle">
+                                    {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                                </div>
+                            </div>
+                            <h4 class="tea-profile-name">{{ auth()->user()->name }}</h4>
+                            <span class="tea-profile-role">Customer Service Agent</span>
+                        </div>
+                        <div class="tea-profile-body">
+                            <div class="tea-profile-info">
+                                <div class="tea-profile-info-label">Email</div>
+                                <div class="tea-profile-info-value">{{ auth()->user()->email }}</div>
+                            </div>
+                            <div class="tea-profile-info">
+                                <div class="tea-profile-info-label">Cases Handled</div>
+                                <div class="tea-profile-info-value">{{ $stats['cases_handled'] ?? 0 }}</div>
+                            </div>
+                            <div class="tea-profile-info">
+                                <div class="tea-profile-info-label">Resolution Rate</div>
+                                <div class="tea-profile-info-value">{{ $stats['resolution_rate'] ?? '0%' }}</div>
+                            </div>
+                            <div class="tea-profile-info mb-0">
+                                <div class="tea-profile-info-label">Average Response Time</div>
+                                <div class="tea-profile-info-value">{{ $stats['avg_response_time'] ?? '0' }} hours</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="tea-admin-card">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="bi bi-lightning me-2"></i>Quick Actions</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-grid gap-2">
+                                <a href="{{ route('customer-service.index') }}" class="tea-btn tea-btn-primary">
+                                    <i class="bi bi-list-ul"></i> View All Cases
+                                </a>
+                                <a href="{{ route('customer-service.analytics') }}" class="tea-btn tea-btn-secondary">
+                                    <i class="bi bi-graph-up"></i> View Analytics
+                                </a>
+                                <a href="{{ route('feedback.index') }}" class="tea-btn tea-btn-secondary">
+                                    <i class="bi bi-chat-dots"></i> View Feedback
+                                </a>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            @endif
         </div>
     </div>
 </div>
+
+<style>
+.avatar-circle {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.tea-avatar-circle {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 600;
+    font-size: 1.5rem;
+    background: var(--tea-green-600);
+    margin: 0 auto;
+}
+
+.tea-profile-card {
+    background: white;
+    border-radius: 1rem;
+    overflow: hidden;
+    border: 1px solid var(--tea-green-200);
+}
+
+.tea-profile-header {
+    background: var(--tea-green-50);
+    padding: 1.5rem;
+    text-align: center;
+    border-bottom: 1px solid var(--tea-green-200);
+}
+
+.tea-profile-name {
+    color: var(--tea-green-800);
+    margin: 1rem 0 0.5rem;
+}
+
+.tea-profile-role {
+    color: var(--tea-green-600);
+    font-size: 0.9rem;
+}
+
+.tea-profile-body {
+    padding: 1.5rem;
+}
+
+.tea-profile-info {
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--tea-green-100);
+}
+
+.tea-profile-info:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+.tea-profile-info-label {
+    color: var(--tea-green-600);
+    font-size: 0.9rem;
+    margin-bottom: 0.25rem;
+}
+
+.tea-profile-info-value {
+    color: var(--tea-green-900);
+    font-weight: 500;
+}
+
+.display-4 {
+    font-size: 3.5rem;
+}
+</style>
 @endsection 
