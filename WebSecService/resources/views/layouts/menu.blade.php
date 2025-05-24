@@ -97,13 +97,6 @@
               @endif
             </a>
           </li>
-          
-          <!-- My Orders - Customer view -->
-          <li class="nav-item">
-            <a class="nav-link d-flex align-items-center" href="{{ route('orders.index') }}">
-              <i class="fas fa-shopping-bag"></i> My Orders
-            </a>
-          </li>
         @endauth
       </ul>
       <ul class="navbar-nav ms-auto">
