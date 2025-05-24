@@ -36,16 +36,17 @@
                                         @foreach($user->roles as $role)
                             <span class="tea-role-badge">{{ $role->name }}</span>
                                         @endforeach
-                    </div>
-                </div>
-
-                <div class="tea-profile-body">
-                    <div class="tea-info-grid">
-                        <div class="tea-info-item">
-                            <div class="tea-info-label">
-                                <i class="bi bi-envelope"></i> Email
-                            </div>
-                            <div class="tea-info-value">{{ $user->email }}</div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Permissions</th>
+                                    <td>
+                                        @foreach($permissions as $permission)
+                                            <span class="badge bg-success">{{ $permission->name }}</span>
+                                        @endforeach
+                                    </td>
+                                </tr>
+                            </table>
                         </div>
 
                         @if($user->hasRole('Customer'))
@@ -94,34 +95,6 @@
                             <a href="{{ route('users_edit', $user->id) }}" class="tea-btn tea-btn-primary">
                                 <i class="bi bi-pencil"></i> Edit Profile
                             </a>
-                        @endif
-                    </div>
-                </div>
-            </div>
-            
-            <!-- SSL Certificate Status Card -->
-            <div class="tea-admin-card">
-                <div class="card-header">
-                    <h4 class="mb-0"><i class="bi bi-shield-check me-2"></i>SSL Certificate Status</h4>
-                </div>
-                <div class="card-body">
-                    <div id="ssl-status-content">
-                        <div class="text-center">
-                            <div class="spinner-border text-tea" role="status">
-                                <span class="visually-hidden">Loading...</span>
-                            </div>
-                            <p class="mt-2">Checking SSL certificate...</p>
-                        </div>
-                    </div>
-                    
-                    <div class="mt-3 d-flex gap-2">
-                        <button class="tea-btn tea-btn-secondary" onclick="refreshSSLStatus()">
-                            <i class="bi bi-arrow-clockwise"></i> Refresh Status
-                        </button>
-                        @if(auth()->user()->hasPermissionTo('edit_users') || auth()->id() == $user->id)
-                        <a href="{{ route('users.certificate', $user) }}" class="tea-btn tea-btn-primary">
-                            <i class="bi bi-gear"></i> Manage Certificate
-                        </a>
                         @endif
                     </div>
                 </div>
@@ -365,27 +338,134 @@
 
 @push('scripts')
 <script>
-    // SSL Certificate Status Functions
-    function refreshSSLStatus() {
-        const statusContent = document.getElementById('ssl-status-content');
-        statusContent.innerHTML = `
-            <div class="text-center">
-                <div class="spinner-border text-tea" role="status">
-                    <span class="visually-hidden">Loading...</span>
-                </div>
-                <p class="mt-2">Checking SSL certificate...</p>
-            </div>
-        `;
+    // Theme management code (existing)
+    document.addEventListener('DOMContentLoaded', function() {
         
-        fetch('{{ route("cert.info") }}')
+        // Preview buttons should update instantly to show theme changes
+        const previewPrimaryBtn = document.querySelector('.d-grid .btn-primary');
+        const previewGradientBtn = document.querySelector('.d-grid .btn-gradient');
+        const previewAlert = document.querySelector('.alert-themed');
+        
+        // Preview theme changes when clicking theme options
+        const themeOptions = document.querySelectorAll('.theme-option');
+        let selectedTheme = document.querySelector('.theme-option.active').getAttribute('data-theme');
+        
+        themeOptions.forEach(option => {
+            option.addEventListener('click', function() {
+                // Update the selected theme
+                selectedTheme = this.getAttribute('data-theme');
+                
+                // Update active class on theme options
+                themeOptions.forEach(opt => opt.classList.remove('active'));
+                this.classList.add('active');
+                
+                // The main theme manager will handle the actual theme change
+                // This just provides immediate visual feedback in the preview section
+                const themeName = this.getAttribute('data-theme');
+                
+                // Update preview elements with appropriate colors based on theme
+                let primaryColor = '#4a6cf7'; // Default blue
+                let gradientStart = '#4a6cf7';
+                let gradientEnd = '#6384ff';
+                
+                if (themeName === 'energy') {
+                    primaryColor = '#e63946';
+                    gradientStart = '#e63946';
+                    gradientEnd = '#ff6b6b';
+                } else if (themeName === 'calm') {
+                    primaryColor = '#2a9d8f';
+                    gradientStart = '#2a9d8f';
+                    gradientEnd = '#57cc99';
+                } else if (themeName === 'ocean') {
+                    primaryColor = '#0077b6';
+                    gradientStart = '#0077b6';
+                    gradientEnd = '#00b4d8';
+                }
+                
+                // Update preview elements
+                previewPrimaryBtn.style.backgroundColor = primaryColor;
+                previewPrimaryBtn.style.borderColor = primaryColor;
+                previewGradientBtn.style.backgroundImage = `linear-gradient(to right, ${gradientStart}, ${gradientEnd})`;
+                previewAlert.style.backgroundColor = primaryColor;
+            });
+        });
+        
+        // Make the Apply Theme button functional
+        const applyThemeBtn = document.getElementById('applyThemeBtn');
+        const darkModeSwitch = document.getElementById('darkModeSwitch');
+        
+        applyThemeBtn.addEventListener('click', function() {
+            // Get the theme manager from the parent page
+            const isDarkMode = darkModeSwitch.checked;
+            
+            // Save to database via AJAX
+            fetch('{{ route('save.theme.preferences') }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify({
+                    theme_dark_mode: isDarkMode,
+                    theme_color: selectedTheme
+                })
+            })
             .then(response => response.json())
             .then(data => {
-                displaySSLStatus(data);
+                if (data.success) {
+                    // Apply the theme changes
+                    if (isDarkMode) {
+                        document.documentElement.setAttribute('data-theme', 'dark');
+                    } else {
+                        document.documentElement.removeAttribute('data-theme');
+                    }
+                    
+                    if (selectedTheme && selectedTheme !== 'default') {
+                        document.documentElement.setAttribute('data-color-theme', selectedTheme);
+                    } else {
+                        document.documentElement.removeAttribute('data-color-theme');
+                    }
+                    
+                    // Show success message
+                    const alert = document.createElement('div');
+                    alert.className = 'alert alert-success animate__animated animate__fadeIn mt-3';
+                    alert.textContent = 'Theme preferences saved successfully!';
+                    applyThemeBtn.parentNode.appendChild(alert);
+                    
+                    // Remove alert after 3 seconds
+                    setTimeout(() => {
+                        alert.classList.remove('animate__fadeIn');
+                        alert.classList.add('animate__fadeOut');
+                        setTimeout(() => alert.remove(), 500);
+                    }, 3000);
+                    
+                    // Update localStorage for consistency
+                    localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+                    if (selectedTheme && selectedTheme !== 'default') {
+                        localStorage.setItem('colorTheme', selectedTheme);
+                    } else {
+                        localStorage.removeItem('colorTheme');
+                    }
+                }
             })
             .catch(error => {
-                statusContent.innerHTML = `
-                    <div class="alert alert-danger">
-                        <i class="bi bi-exclamation-triangle me-2"></i>
-                        Failed to fetch certificate status
-                    </div>
-                `
+                console.error('Error saving theme preferences:', error);
+                
+                // Show error message
+                const alert = document.createElement('div');
+                alert.className = 'alert alert-danger animate__animated animate__fadeIn mt-3';
+                alert.textContent = 'Error saving theme preferences. Please try again.';
+                applyThemeBtn.parentNode.appendChild(alert);
+                
+                // Remove alert after 3 seconds
+                setTimeout(() => {
+                    alert.classList.remove('animate__fadeIn');
+                    alert.classList.add('animate__fadeOut');
+                    setTimeout(() => alert.remove(), 500);
+                }, 3000);
+            });
+        });
+    });
+</script>
+@endpush
+@endsection
