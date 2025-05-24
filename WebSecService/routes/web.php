@@ -102,6 +102,7 @@ Route::get('orders/{order}', [OrdersController::class, 'show'])->name('orders.sh
 Route::middleware(['auth'])->group(function () {
     Route::post('cart/add/{product}', [OrdersController::class, 'addToCart'])->name('cart.add');
     Route::get('cart', [OrdersController::class, 'cart'])->name('cart');
+    Route::put('cart/update/{productId}', [OrdersController::class, 'updateCart'])->name('cart.update');
     Route::delete('cart/remove/{productId}', [OrdersController::class, 'removeFromCart'])->name('cart.remove');
     Route::get('checkout', [OrdersController::class, 'checkout'])->name('checkout');
     Route::post('place-order', [OrdersController::class, 'placeOrder'])->name('orders.place');
