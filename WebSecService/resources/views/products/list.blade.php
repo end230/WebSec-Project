@@ -1,6 +1,73 @@
 @extends('layouts.master')
 @section('title', 'Products')
 
+@push('styles')
+<style>
+/* Filter Tags Styles */
+.active-filters {
+    padding: 10px;
+    border-radius: 8px;
+    background-color: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+}
+
+.active-filters .badge {
+    padding: 8px 12px;
+    margin: 4px;
+    font-size: 0.9rem;
+    border-radius: 20px;
+    background-color: var(--bs-success);
+    color: white;
+}
+
+/* Enhanced Filter Panel Styles */
+.filter-panel {
+    background-color: rgba(255, 255, 255, 0.95);
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(10px);
+}
+
+.search-box {
+    display: flex;
+    gap: 10px;
+    background-color: rgba(255, 255, 255, 0.95);
+    padding: 15px;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.search-input {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 10px 15px;
+}
+
+.btn-filter {
+    background-color: var(--bs-success);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+}
+
+.btn-filter:hover {
+    background-color: var(--bs-success-dark);
+    color: white;
+}
+
+/* Rating Filter Styles */
+.rating-filter .form-check {
+    margin-bottom: 8px;
+}
+
+.rating-filter .bi {
+    font-size: 1rem;
+}
+</style>
+@endpush
+
 @section('content')
 <div class="tea-garden">
     <!-- Falling Leaves Animation -->
@@ -744,3 +811,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 @endsection
+
+@push('scripts')
+<script src="{{ asset('js/product-filter.js') }}"></script>
+@endpush
