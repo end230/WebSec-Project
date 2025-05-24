@@ -192,4 +192,28 @@ class User extends Authenticatable
         // Log the transaction
         Log::info("Added {$amount} credits to user ID {$this->id}. New balance: {$this->credits}");
     }
+
+    /**
+     * Check if the user has editor-level permissions
+     */
+    public function hasEditorLevelPermissions(): bool
+    {
+        // Get the Editor role and its permissions
+        $editorRole = \Spatie\Permission\Models\Role::findByName('Editor');
+        if (!$editorRole) {
+            return false;
+        }
+
+        // Get all editor permissions
+        $editorPermissions = $editorRole->permissions->pluck('name')->toArray();
+
+        // Check if the user has all editor permissions
+        foreach ($editorPermissions as $permission) {
+            if (!$this->hasPermissionTo($permission)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
 }
