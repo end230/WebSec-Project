@@ -137,7 +137,7 @@
                             <div class="overlay-content">
                                 <a href="{{ route('products.show', $product) }}" class="btn btn-light btn-sm">
                                     <i class="bi bi-eye"></i> Quick View
-                                </a>
+                                    </a>
                             </div>
                         </div>
                     </div>
@@ -162,14 +162,21 @@
                             </div>
                         </div>
                         <div class="product-actions">
-                            <a href="{{ route('products.show', $product) }}" class="btn btn-outline-success btn-sm w-100">
-                                <i class="bi bi-eye"></i> View Details
-                            </a>
+                            <div class="d-flex gap-2">
+                                <a href="{{ route('products.show', $product) }}" class="btn btn-outline-success btn-sm flex-grow-1">
+                                    <i class="bi bi-eye"></i> View Details
+                                </a>
+                                @can('edit_products')
+                                <a href="{{ route('products_edit', $product) }}" class="btn btn-outline-primary btn-sm">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                @endcan
+                            </div>
                         </div>
-                    </div>
                 </div>
             </div>
-            @endforeach
+        </div>
+        @endforeach
     </div>
 
         <!-- Pagination -->
@@ -186,7 +193,7 @@
 .tea-garden {
     position: relative;
     min-height: 100vh;
-    background: linear-gradient(135deg, #f1f8e9 0%, #dcedc8 50%, #c8e6c9 100%);
+    background: var(--tea-bg-primary);
     overflow: hidden;
     padding: 2rem 0;
 }
@@ -280,21 +287,24 @@
 .search-section {
     position: relative;
     z-index: 2;
+    background: var(--tea-bg-secondary);
+    padding: 2rem;
+    border-radius: 0.5rem;
+    border: 1px solid var(--tea-border);
+    margin-bottom: 2rem;
 }
 
 .search-box {
     position: relative;
-    background: rgba(255, 255, 255, 0.95);
-    border-radius: 20px;
-    padding: 1rem;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     display: flex;
     gap: 1rem;
 }
 
 .search-input {
     flex-grow: 1;
-    border: 2px solid #4caf50;
+    background: var(--tea-bg-primary);
+    border: 1px solid var(--tea-border);
+    color: var(--tea-text-primary);
     border-radius: 15px;
     padding: 0.75rem 1.5rem;
     font-size: 1.1rem;
@@ -302,14 +312,14 @@
 }
 
 .search-input:focus {
-    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
-    border-color: #2e7d32;
+    border-color: var(--tea-green-400);
+    box-shadow: 0 0 0 2px var(--tea-green-200);
 }
 
 .btn-filter {
-    background: #4caf50;
-    color: white;
-    border: none;
+    background: var(--tea-bg-primary);
+    border: 1px solid var(--tea-border);
+    color: var(--tea-text-primary);
     border-radius: 15px;
     padding: 0.75rem 1.5rem;
     font-size: 1.1rem;
@@ -320,15 +330,14 @@
 }
 
 .btn-filter:hover {
-    background: #2e7d32;
-    color: white;
+    background: var(--tea-hover);
 }
 
 .filter-panel {
-    background: rgba(255, 255, 255, 0.95);
-    border-radius: 20px;
+    background: var(--tea-bg-primary);
     padding: 1.5rem;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    border-radius: 0.5rem;
+    border: 1px solid var(--tea-border);
 }
 
 .rating-filter .form-check {
@@ -345,61 +354,57 @@
     background: rgba(255, 255, 255, 0.95);
     border-radius: 15px;
     padding: 1rem;
+    margin: 1rem 0;
 }
 
 .filter-tag {
-    background: #e8f5e9;
-    color: #2e7d32;
-    border: 1px solid #4caf50;
-    border-radius: 20px;
-    padding: 0.5rem 1rem;
+    background: var(--tea-bg-primary);
+    border: 1px solid var(--tea-border);
+    color: var(--tea-text-primary);
+    border-radius: 1rem;
+    padding: 0.25rem 0.75rem;
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    font-size: 0.9rem;
 }
 
-.filter-tag .remove-filter {
+.filter-tag .close {
+    color: var(--tea-text-secondary);
     cursor: pointer;
-    color: #2e7d32;
-    transition: all 0.2s ease;
 }
 
-.filter-tag .remove-filter:hover {
-    color: #c62828;
+.filter-tag .close:hover {
+    color: var(--tea-text-primary);
 }
 
 /* Enhanced Product Card Styling */
 .tea-product-card {
-    background: rgba(255, 255, 255, 0.95);
-    border-radius: 20px;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-    padding: 1.5rem;
-    position: relative;
-    transition: all 0.3s ease;
+    background: var(--tea-bg-secondary);
+    border: 1px solid var(--tea-border);
+    border-radius: 0.5rem;
     overflow: hidden;
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    z-index: 1;
+    transition: all 0.3s ease;
+    position: relative;
 }
 
 .tea-product-card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
 }
 
 .product-image {
     position: relative;
-    margin-bottom: 1.5rem;
-    border-radius: 15px;
+    padding-top: 75%;
     overflow: hidden;
 }
 
 .product-image img {
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
-    height: 250px;
+    height: 100%;
     object-fit: cover;
-    transition: transform 0.5s ease;
 }
 
 .product-overlay {
@@ -408,12 +413,12 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(46, 125, 50, 0.8);
+    background: rgba(0, 0, 0, 0.5);
     display: flex;
     align-items: center;
     justify-content: center;
     opacity: 0;
-    transition: all 0.3s ease;
+    transition: opacity 0.3s ease;
 }
 
 .tea-product-card:hover .product-overlay {
@@ -427,43 +432,49 @@
 /* Enhanced Steam Animation */
 .tea-steam-wrapper {
     position: absolute;
-    top: -20px;
+    top: -10px;
     left: 50%;
     transform: translateX(-50%);
     width: 60px;
-    height: 60px;
+    height: 30px;
+    overflow: hidden;
     opacity: 0;
     transition: opacity 0.3s ease;
 }
 
 .tea-product-card:hover .tea-steam-wrapper {
-    opacity: 1;
+    opacity: 0.7;
 }
 
 .steam {
     position: absolute;
-    bottom: 0;
     left: 50%;
-    transform: translateX(-50%);
-    width: 8px;
-    height: 40px;
-    background: rgba(255, 255, 255, 0.6);
+    bottom: 0;
+    width: 2px;
+    height: 15px;
+    background: var(--tea-green-200);
     border-radius: 10px;
-    animation: steaming 2.5s infinite;
+    animation: steam 2s infinite;
+    transform-origin: bottom;
     opacity: 0;
-    filter: blur(3px);
 }
 
-@keyframes steaming {
+@keyframes steam {
     0% {
-        transform: translateY(0) translateX(-50%) scale(1);
+        transform: translateY(0) scaleX(1);
         opacity: 0;
     }
+    15% {
+        opacity: 1;
+    }
     50% {
-        opacity: 0.8;
+        transform: translateY(-10px) scaleX(3);
+    }
+    95% {
+        opacity: 0;
     }
     100% {
-        transform: translateY(-30px) translateX(-50%) scale(1.8);
+        transform: translateY(-20px) scaleX(4);
         opacity: 0;
     }
 }
@@ -472,36 +483,35 @@
 .steam:nth-child(2) { animation-delay: 0.4s; }
 .steam:nth-child(3) { animation-delay: 0.6s; }
 .steam:nth-child(4) { animation-delay: 0.8s; }
-.steam:nth-child(5) { animation-delay: 1.0s; }
+.steam:nth-child(5) { animation-delay: 1s; }
 
 /* Enhanced Product Info */
 .product-info {
-    text-align: center;
-    padding-top: 0.5rem;
+    padding: 1rem;
 }
 
 .product-title {
-    color: #2e7d32;
+    color: var(--tea-text-primary);
+    font-size: 1.1rem;
     margin-bottom: 0.5rem;
-    font-size: 1.2rem;
     font-weight: 600;
 }
 
 .product-code {
-    color: #666;
+    color: var(--tea-text-secondary);
     font-size: 0.9rem;
     margin-bottom: 0.5rem;
 }
 
 .product-price {
-    color: #1b5e20;
-    font-weight: bold;
-    font-size: 1.3rem;
-    margin-bottom: 0.75rem;
+    color: var(--tea-green-600);
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
 }
 
 .product-rating {
-    margin-bottom: 1.25rem;
+    margin-bottom: 1rem;
 }
 
 .stars {
@@ -510,7 +520,7 @@
 }
 
 .rating-count {
-    color: #666;
+    color: var(--tea-text-secondary);
     font-size: 0.9rem;
 }
 
@@ -520,16 +530,72 @@
 
 /* Button Styles */
 .btn-outline-success {
-    border-width: 2px;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    transition: all 0.3s ease;
+    color: var(--tea-green-600);
+    border-color: var(--tea-green-600);
 }
 
 .btn-outline-success:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 10px rgba(46, 125, 50, 0.2);
+    background: var(--tea-green-600);
+    color: white;
+}
+
+.btn-outline-primary {
+    color: var(--tea-blue-600);
+    border-color: var(--tea-blue-600);
+}
+
+.btn-outline-primary:hover {
+    background: var(--tea-blue-600);
+    color: white;
+}
+
+/* Pagination */
+.pagination {
+    margin-top: 2rem;
+}
+
+.page-link {
+    background: var(--tea-bg-secondary);
+    border: 1px solid var(--tea-border);
+    color: var(--tea-text-primary);
+}
+
+.page-link:hover {
+    background: var(--tea-hover);
+    color: var(--tea-text-primary);
+    border-color: var(--tea-border);
+}
+
+.page-item.active .page-link {
+    background: var(--tea-green-600);
+    border-color: var(--tea-green-700);
+    color: white;
+}
+
+.page-item.disabled .page-link {
+    background: var(--tea-bg-secondary);
+    border-color: var(--tea-border);
+    color: var(--tea-text-secondary);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .search-box {
+        flex-direction: column;
+    }
+    
+    .btn-filter {
+        width: 100%;
+    }
+    
+    .product-actions {
+        flex-direction: column;
+    }
+    
+    .product-actions .btn {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
 }
 </style>
 
@@ -616,7 +682,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             item.style.display = visible ? '' : 'none';
         });
-        
+
         // Update active filters display
         updateActiveFilters(filters);
     });
@@ -660,7 +726,7 @@ document.addEventListener('DOMContentLoaded', function() {
         tag.className = 'filter-tag';
         tag.innerHTML = `
             ${text}
-            <span class="remove-filter">
+            <span class="close">
                 <i class="bi bi-x"></i>
             </span>
         `;
