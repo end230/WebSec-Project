@@ -67,7 +67,7 @@ class UsersController extends Controller {
         $link = route("verify", ['token' => $token]);
         Mail::to($user->email)->send(new VerificationEmail($link, $user->name));
         
-        return redirect()->route('users_list');
+        return redirect()->route('products_list')->with('success', 'Registration successful! Please check your email for verification.');
     }
 
     public function verify(Request $request) {
