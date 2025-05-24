@@ -1,7 +1,9 @@
-<nav class="navbar navbar-expand-lg navbar-light fixed-top animate__animated animate__fadeInDown">
+<nav class="navbar navbar-expand-lg navbar-light fixed-top animate__animated animate__fadeInDown" style="animation-duration: 0.5s;">
   <div class="container">
     <a class="navbar-brand d-flex align-items-center" href="/">
-      <i class="bi bi-bag-heart me-2" style="font-size: 1.4rem; color: var(--primary-color);"></i>
+      <div class="brand-icon">
+        <i class="bi bi-bag-heart"></i>
+      </div>
       <span>Modern Store</span>
     </a>
     <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -168,4 +170,219 @@
   </div>
 </nav>
 <!-- Add padding to body to account for fixed navbar -->
-<div style="padding-top: 70px;"></div>
+<div style="padding-top: 60px;"></div>
+
+<style>
+/* Modern Navbar Styling */
+.navbar {
+    height: 60px;
+    background: rgba(139, 69, 19, 0.15); /* Soft brown base */
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+    border-bottom: 1px solid rgba(156, 175, 136, 0.1);
+}
+
+.navbar.scrolled {
+    background: rgba(139, 69, 19, 0.25); /* Slightly darker brown when scrolled */
+    box-shadow: 0 2px 15px rgba(47, 82, 51, 0.1);
+}
+
+/* Dark mode overrides */
+[data-theme="dark"] .navbar {
+    background: rgba(47, 82, 51, 0.85); /* Dark green base */
+    border-bottom: 1px solid rgba(156, 175, 136, 0.05);
+}
+
+[data-theme="dark"] .navbar.scrolled {
+    background: rgba(47, 82, 51, 0.95); /* Darker green when scrolled */
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Brand Icon Animation */
+.brand-icon {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 0.5rem;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.brand-icon i {
+    font-size: 1.4rem;
+    color: var(--theme-primary);
+    transition: all 0.3s ease;
+}
+
+[data-theme="dark"] .brand-icon i {
+    color: rgba(156, 175, 136, 0.9); /* Lighter green in dark mode */
+}
+
+.brand-icon:hover {
+    transform: scale(1.1);
+}
+
+.brand-icon:hover i {
+    animation: pulse 1s infinite;
+}
+
+/* Navbar Links */
+.navbar-nav .nav-link {
+    position: relative;
+    padding: 0.5rem 1rem;
+    color: var(--text-color) !important;
+    transition: all 0.3s ease;
+    opacity: 0.9;
+}
+
+[data-theme="dark"] .navbar-nav .nav-link {
+    color: rgba(255, 253, 208, 0.9) !important; /* Light cream color in dark mode */
+}
+
+.navbar-nav .nav-link:hover {
+    transform: scale(1.05);
+    opacity: 1;
+}
+
+.navbar-nav .nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background: var(--theme-primary);
+    transition: all 0.3s ease;
+    transform: translateX(-50%);
+    opacity: 0;
+}
+
+[data-theme="dark"] .navbar-nav .nav-link::after {
+    background: rgba(156, 175, 136, 0.9); /* Lighter green in dark mode */
+}
+
+.navbar-nav .nav-link:hover::after,
+.navbar-nav .nav-link.active::after {
+    width: 100%;
+    opacity: 1;
+}
+
+/* Dropdown Styling */
+.dropdown-menu {
+    border: 1px solid rgba(139, 69, 19, 0.1);
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: 0 5px 15px rgba(47, 82, 51, 0.08);
+    animation: fadeIn 0.3s ease;
+}
+
+[data-theme="dark"] .dropdown-menu {
+    background: rgba(47, 82, 51, 0.95);
+    border: 1px solid rgba(156, 175, 136, 0.1);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.dropdown-item {
+    transition: all 0.3s ease;
+    padding: 0.5rem 1rem;
+    color: var(--text-color);
+}
+
+[data-theme="dark"] .dropdown-item {
+    color: rgba(255, 253, 208, 0.9);
+}
+
+.dropdown-item:hover {
+    background: rgba(139, 69, 19, 0.05);
+    transform: translateX(5px);
+}
+
+[data-theme="dark"] .dropdown-item:hover {
+    background: rgba(156, 175, 136, 0.1);
+}
+
+/* Badge Styling */
+.badge {
+    transition: all 0.3s ease;
+}
+
+[data-theme="dark"] .badge {
+    opacity: 0.9;
+}
+
+.navbar-nav .nav-link:hover .badge {
+    transform: scale(1.1);
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 991.98px) {
+    .navbar-collapse {
+        background: rgba(255, 255, 255, 0.98);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        padding: 1rem;
+        border-radius: 10px;
+        margin-top: 0.5rem;
+        box-shadow: 0 5px 15px rgba(47, 82, 51, 0.08);
+        border: 1px solid rgba(139, 69, 19, 0.1);
+    }
+
+    [data-theme="dark"] .navbar-collapse {
+        background: rgba(47, 82, 51, 0.98);
+        border: 1px solid rgba(156, 175, 136, 0.1);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+    
+    .navbar-nav .nav-link::after {
+        bottom: -2px;
+    }
+}
+
+/* Divider styling */
+.dropdown-divider {
+    border-top: 1px solid rgba(139, 69, 19, 0.1);
+}
+
+[data-theme="dark"] .dropdown-divider {
+    border-top: 1px solid rgba(156, 175, 136, 0.1);
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+</style>
+
+<script>
+// Add scroll effect to navbar
+document.addEventListener('DOMContentLoaded', function() {
+    const navbar = document.querySelector('.navbar');
+    
+    window.addEventListener('scroll', function() {
+        if (window.scrollY > 10) {
+            navbar.classList.add('scrolled');
+        } else {
+            navbar.classList.remove('scrolled');
+        }
+    });
+    
+    // Add active class to current page link
+    const currentPath = window.location.pathname;
+    document.querySelectorAll('.navbar-nav .nav-link').forEach(link => {
+        if (link.getAttribute('href') === currentPath) {
+            link.classList.add('active');
+        }
+    });
+});
+</script>
