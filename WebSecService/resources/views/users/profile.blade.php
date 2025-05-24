@@ -100,32 +100,7 @@
             </div>
             
             <!-- SSL Certificate Status Card -->
-            <div class="tea-admin-card">
-                <div class="card-header">
-                    <h4 class="mb-0"><i class="bi bi-shield-check me-2"></i>SSL Certificate Status</h4>
-                </div>
-                <div class="card-body">
-                    <div id="ssl-status-content">
-                        <div class="text-center">
-                            <div class="spinner-border text-tea" role="status">
-                                <span class="visually-hidden">Loading...</span>
-                            </div>
-                            <p class="mt-2">Checking SSL certificate...</p>
-                        </div>
-                    </div>
-                    
-                    <div class="mt-3 d-flex gap-2">
-                        <button class="tea-btn tea-btn-secondary" onclick="refreshSSLStatus()">
-                            <i class="bi bi-arrow-clockwise"></i> Refresh Status
-                        </button>
-                        @if(auth()->user()->hasPermissionTo('edit_users') || auth()->id() == $user->id)
-                        <a href="{{ route('users.certificate', $user) }}" class="tea-btn tea-btn-primary">
-                            <i class="bi bi-gear"></i> Manage Certificate
-                        </a>
-                        @endif
-                    </div>
-                </div>
-            </div>
+        
         </div>
         
         <!-- Account Stats -->
