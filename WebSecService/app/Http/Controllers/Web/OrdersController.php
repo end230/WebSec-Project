@@ -37,7 +37,7 @@ class OrdersController extends Controller
 
         // If user has permissions to manage orders, show all orders and feedback analytics
         if ($user->hasPermissionTo('manage_orders')) {
-            $orders = Order::with('user')->orderBy('created_at', 'desc')->get();
+            $orders = Order::with('user')->orderBy('created_at', 'desc')->paginate(10);
             
             // Feedback analytics data
             $recentFeedbackCount = Feedback::where('created_at', '>=', Carbon::now()->subDays(7))->count();
@@ -63,7 +63,7 @@ class OrdersController extends Controller
         // For customers, only show their orders
         $orders = Order::where('user_id', $user->id)
             ->orderBy('created_at', 'desc')
-            ->get();
+            ->paginate(10);
 
         return view('orders.index', compact('orders'));
     }
@@ -198,6 +198,57 @@ class OrdersController extends Controller
         }
 
         return redirect()->back();
+    }
+
+    /**
+     * Update the quantity of an item in the cart
+     */
+    public function updateCart(Request $request, $productId)
+    {
+        $cart = Session::get('cart', []);
+        
+        if (!isset($cart[$productId])) {
+            return redirect()->back()->with('error', 'Product not found in cart.');
+        }
+
+        $product = Product::find($productId);
+        if (!$product) {
+            return redirect()->back()->with('error', 'Product not found.');
+        }
+
+        // Get the new quantity from request
+        $newQuantity = (int) $request->input('quantity', 1);
+        
+        // Prevent negative quantities
+        if ($newQuantity <= 0) {
+            return redirect()->back()->with('error', 'Quantity must be positive.');
+        }
+
+        // Calculate the difference in quantity
+        $originalQuantity = (int) $cart[$productId]['quantity'];
+        $quantityDifference = $newQuantity - $originalQuantity;
+
+        // Check if we have enough stock for the increase
+        if ($quantityDifference > 0) {
+            if ($product->stock_quantity < $quantityDifference) {
+                return redirect()->back()->with('error', 'Not enough stock available.');
+            }
+            // Decrease stock for additional items
+            if (!$product->updateStock($quantityDifference)) {
+                return redirect()->back()->with('error', 'Failed to update stock.');
+            }
+        } elseif ($quantityDifference < 0) {
+            // Increase stock for removed items
+            if (!$product->updateStock($quantityDifference)) {
+                return redirect()->back()->with('error', 'Failed to update stock.');
+            }
+        }
+
+        // Update cart quantity
+        $cart[$productId]['quantity'] = $newQuantity;
+        Session::put('cart', $cart);
+
+        return redirect()->back()->with('success', 'Cart updated successfully.');
     }
 
     /**

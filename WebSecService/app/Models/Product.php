@@ -79,7 +79,7 @@ class Product extends Model  {
      */
     public function comments()
     {
-        return $this->hasMany(ProductComment::class)->approved()->orderBy('created_at', 'desc');
+        return $this->hasMany(ProductComment::class)->orderBy('created_at', 'desc');
     }
 
     /**

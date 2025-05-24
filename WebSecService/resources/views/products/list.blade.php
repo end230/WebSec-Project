@@ -1,406 +1,746 @@
 @extends('layouts.master')
 @section('title', 'Products')
+
 @section('content')
-
-<div class="card shadow-sm">
-    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-        <h2 class="mb-0">Products</h2>
-        @auth
-            @if(auth()->user()->hasPermissionTo('add_products'))
-                <div class="mb-4">
-                    <a href="{{ route('products_edit') }}" class="btn btn-success">
-                        <i class="bi bi-plus-circle me-1"></i> Add New Product
-                    </a>
-                </div>
-            @endif
-        @endauth
+<div class="tea-garden">
+    <!-- Falling Leaves Animation -->
+    <div class="leaves-container">
+        <div class="leaves falling">
+            @for($i = 1; $i <= 40; $i++)
+                <div class="leaf leaf-{{ rand(1, 4) }}" style="--delay: {{ $i * 0.5 }}; --start-pos: {{ rand(0, 100) }};">
+                    @switch(rand(1, 4))
+                        @case(1) 🍃 @break
+                        @case(2) 🌿 @break
+                        @case(3) ☘️ @break
+                        @case(4) 🍂 @break
+                    @endswitch
     </div>
-    <div class="card-body">
-        <form method="get" action="{{ route('products_list') }}" class="mb-4">
-            <div class="row g-3">
-                <div class="col-md-3">
-                    <div class="input-group">
-                        <span class="input-group-text bg-transparent"><i class="bi bi-search"></i></span>
-                        <input class="form-control border-start-0" placeholder="Search by name" name="keywords" value="{{ request()->keywords }}"/>
-                    </div>
+        @endfor
+    </div>
+        <div class="leaves rising">
+            @for($i = 1; $i <= 20; $i++)
+                <div class="leaf leaf-{{ rand(1, 4) }}" style="--delay: {{ $i * 0.8 }}; --start-pos: {{ rand(0, 100) }};">
+                    @switch(rand(1, 4))
+                        @case(1) 🍃 @break
+                        @case(2) 🌿 @break
+                        @case(3) ☘️ @break
+                        @case(4) 🍂 @break
+                    @endswitch
                 </div>
-                <div class="col-md-3">
-                    <div class="input-group">
-                        <span class="input-group-text bg-transparent"><i class="bi bi-currency-dollar"></i></span>
-                        <input class="form-control border-start-0" type="number" step="0.01" placeholder="Min Price" name="min_price" value="{{ request()->min_price }}"/>
+            @endfor
+    </div>
+</div>
+
+<div class="container py-5">
+        <!-- Search and Filter Section -->
+        <div class="search-section mb-5">
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    <div class="search-box">
+                        <input type="text" class="form-control search-input" id="searchInput" placeholder="Search for products...">
+                        <button class="btn btn-filter" type="button" data-bs-toggle="collapse" data-bs-target="#filterPanel">
+                            <i class="bi bi-sliders"></i> Filters
+                </button>
                     </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="input-group">
-                        <span class="input-group-text bg-transparent"><i class="bi bi-currency-dollar"></i></span>
-                        <input class="form-control border-start-0" type="number" step="0.01" placeholder="Max Price" name="max_price" value="{{ request()->max_price }}"/>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <button type="submit" class="btn btn-primary w-100">
-                        <i class="bi bi-funnel me-1"></i> Apply Filters
-                    </button>
-                </div>
-            </div>
-        </form>
-
-        @if(session('success'))
-            <div class="alert alert-success mb-3">
-                {{ session('success') }}
-            </div>
-        @endif
-
-        <!-- Product grid -->
-        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-            @foreach($products as $product)
-            <div class="col">
-                <div class="card h-100 product-card animate__animated animate__fadeIn" data-aos="fade-up" data-aos-delay="{{ $loop->index * 50 }}">
-                    <div class="position-absolute top-0 end-0 p-3">
-                        @if($product->stock_quantity > 0)
-                            <span class="badge bg-success">In Stock</span>
-                        @else
-                            <span class="badge bg-danger">Out of Stock</span>
-                        @endif
-                    </div>
-
-                    <img src="{{ $product->getMainPhotoUrl() }}" class="card-img-top" alt="{{ $product->name }}" style="height: 200px; object-fit: cover;">
-
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-start mb-2">
-                            <h5 class="card-title">{{ $product->name }}</h5>
-                            <h5 class="text-primary">${{ number_format($product->price, 2) }}</h5>
+                    
+                    <!-- Advanced Filter Panel -->
+                    <div class="collapse mt-3" id="filterPanel">
+                        <div class="filter-panel">
+                            <form id="filterForm">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Price Range</label>
+                                        <div class="d-flex gap-2 align-items-center">
+                                            <input type="number" class="form-control" placeholder="Min" name="price_min">
+                                            <span>-</span>
+                                            <input type="number" class="form-control" placeholder="Max" name="price_max">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Sort By</label>
+                                        <select class="form-select" name="sort">
+                                            <option value="newest">Newest First</option>
+                                            <option value="price_low">Price: Low to High</option>
+                                            <option value="price_high">Price: High to Low</option>
+                                            <option value="rating">Highest Rated</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Stock Status</label>
+                                        <div class="btn-group w-100" role="group">
+                                            <input type="radio" class="btn-check" name="stock" id="all" value="all" checked>
+                                            <label class="btn btn-outline-success" for="all">All</label>
+                                            
+                                            <input type="radio" class="btn-check" name="stock" id="in_stock" value="in_stock">
+                                            <label class="btn btn-outline-success" for="in_stock">In Stock</label>
+                                            
+                                            <input type="radio" class="btn-check" name="stock" id="out_stock" value="out_stock">
+                                            <label class="btn btn-outline-success" for="out_stock">Out of Stock</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Rating</label>
+                                        <div class="rating-filter">
+                                            @for($i = 5; $i >= 1; $i--)
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" name="rating[]" value="{{ $i }}" id="rating{{ $i }}">
+                                                    <label class="form-check-label" for="rating{{ $i }}">
+                                                        @for($j = 1; $j <= 5; $j++)
+                                                            @if($j <= $i)
+                                                                <i class="bi bi-star-fill text-success"></i>
+                                                @else
+                                                                <i class="bi bi-star text-success"></i>
+                                                @endif
+                                                        @endfor
+                                                        & Up
+                                                    </label>
+                                                </div>
+                                            @endfor
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="d-flex justify-content-end gap-2">
+                                            <button type="reset" class="btn btn-outline-secondary">
+                                                <i class="bi bi-x-circle"></i> Reset
+                                            </button>
+                                            <button type="submit" class="btn btn-success">
+                                                <i class="bi bi-check2-circle"></i> Apply Filters
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
                         </div>
-                        <p class="card-text text-muted small mb-2">{{ $product->code }} | {{ $product->model }}</p>
-                        <p class="card-text">{{ str($product->description)->limit(100) }}</p>
-                        
-                        <!-- Rating and Reviews Summary -->
-                        @if($product->getReviewCount() > 0)
-                            <div class="mb-3">
-                                <div class="d-flex align-items-center">
-                                    @for($i = 1; $i <= 5; $i++)
-                                        @if($i <= round($product->getAverageRating()))
-                                            <i class="bi bi-star-fill text-warning"></i>
-                                        @else
-                                            <i class="bi bi-star text-muted"></i>
-                                        @endif
-                                    @endfor
-                                    <span class="ms-2 small">
-                                        {{ number_format($product->getAverageRating(), 1) }} ({{ $product->getReviewCount() }} {{ $product->getReviewCount() === 1 ? 'review' : 'reviews' }})
-                                    </span>
-                                </div>
-                            </div>
-                        @endif
-
-                        <!-- Recent Comments -->
-                        @if($product->comments->count() > 0)
-                            <div class="mb-3">
-                                <h6 class="text-muted mb-2">Recent Reviews:</h6>
-                                @foreach($product->comments->take(2) as $comment)
-                                    <div class="mb-2 p-2 bg-light rounded">
-                                        <div class="d-flex justify-content-between align-items-start">
-                                            <div>
-                                                <div class="d-flex align-items-center mb-1">
-                                                    @for($i = 1; $i <= 5; $i++)
-                                                        @if($i <= $comment->rating)
-                                                            <i class="bi bi-star-fill text-warning" style="font-size: 0.8rem;"></i>
-                                                        @else
-                                                            <i class="bi bi-star text-muted" style="font-size: 0.8rem;"></i>
-                                                        @endif
-                                                    @endfor
-                                                    <small class="ms-2 fw-bold">{{ $comment->user->name }}</small>
-                                                    @if($comment->is_verified_purchase)
-                                                        <span class="badge bg-success ms-1" style="font-size: 0.6rem;">Verified</span>
-                                                    @endif
-                                                </div>
-                                                <p class="mb-0 small">{{ str($comment->comment)->limit(60) }}</p>
-                                            </div>
-                                            <small class="text-muted">{{ $comment->created_at->diffForHumans() }}</small>
-                                        </div>
-                                    </div>
-                                @endforeach
-                                @if($product->comments->count() > 2)
-                                    <small class="text-muted">
-                                        <a href="{{ route('products.show', $product) }}" class="text-decoration-none">
-                                            View all {{ $product->comments->count() }} reviews
-                                        </a>
-                                    </small>
-                                @endif
-                            </div>
-                        @endif
-
-                        <!-- Quick Review Section -->
-                        @auth
-                            @if(isset($userPurchases[$product->id]) && !isset($userComments[$product->id]))
-                                <!-- User can leave a quick review -->
-                                <div class="mt-3 pt-3 border-top">
-                                    <h6 class="text-success mb-2">
-                                        <i class="bi bi-check-circle me-1"></i>You can review this product!
-                                    </h6>
-                                    <form action="{{ route('products.comments.store', $product) }}" method="POST" class="quick-review-form">
-                                        @csrf
-                                        <div class="mb-2">
-                                            <div class="d-flex align-items-center">
-                                                <small class="me-2">Rating:</small>
-                                                <div class="rating-quick">
-                                                    @for($i = 5; $i >= 1; $i--)
-                                                        <input type="radio" name="rating" value="{{ $i }}" id="quick-star{{ $i }}-{{ $product->id }}" required>
-                                                        <label for="quick-star{{ $i }}-{{ $product->id }}" class="star-quick">
-                                                            <i class="bi bi-star-fill"></i>
-                                                        </label>
-                                                    @endfor
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="mb-2">
-                                            <textarea name="comment" class="form-control form-control-sm" rows="2" 
-                                                placeholder="Write your review..." maxlength="500" required></textarea>
-                                        </div>
-                                        <div class="d-flex justify-content-between">
-                                            <button type="submit" class="btn btn-success btn-sm">
-                                                <i class="bi bi-send me-1"></i>Submit Review
-                                            </button>
-                                            <a href="{{ route('products.show', $product) }}" class="btn btn-outline-primary btn-sm">
-                                                <i class="bi bi-eye me-1"></i>View Details
-                                            </a>
-                                        </div>
-                                    </form>
-                                </div>
-                            @elseif(isset($userComments[$product->id]))
-                                <!-- User has already reviewed -->
-                                <div class="mt-3 pt-3 border-top">
-                                    <div class="alert alert-success py-2 mb-2">
-                                        <small><i class="bi bi-check-circle me-1"></i>You've reviewed this product!</small>
-                                    </div>
-                                    <a href="{{ route('products.show', $product) }}" class="btn btn-outline-primary btn-sm w-100">
-                                        <i class="bi bi-eye me-1"></i>View Your Review
-                                    </a>
-                                </div>
-                            @elseif(!isset($userPurchases[$product->id]))
-                                <!-- User hasn't purchased -->
-                                <div class="mt-3 pt-3 border-top">
-                                    <div class="alert alert-warning py-2 mb-2">
-                                        <small><i class="bi bi-info-circle me-1"></i>Purchase to review this product</small>
-                                    </div>
-                                    <a href="{{ route('products.show', $product) }}" class="btn btn-outline-primary btn-sm w-100">
-                                        <i class="bi bi-eye me-1"></i>View Details
-                                    </a>
-                                </div>
-                            @endif
-                        @else
-                            <!-- Guest user -->
-                            @if($product->comments->count() === 0)
-                                <div class="mt-3 pt-3 border-top">
-                                    <div class="alert alert-info py-2 mb-2">
-                                        <small><i class="bi bi-info-circle me-1"></i>No reviews yet. Be the first!</small>
-                                    </div>
-                                    <div class="d-flex gap-2">
-                                        <a href="{{ route('login') }}" class="btn btn-outline-success btn-sm flex-fill">
-                                            <i class="bi bi-person me-1"></i>Sign In
-                                        </a>
-                                        <a href="{{ route('products.show', $product) }}" class="btn btn-outline-primary btn-sm flex-fill">
-                                            <i class="bi bi-eye me-1"></i>Details
-                                        </a>
-                                    </div>
-                                </div>
-                            @else
-                                <div class="mt-3 pt-3 border-top">
-                                    <div class="d-flex gap-2">
-                                        <a href="{{ route('login') }}" class="btn btn-outline-success btn-sm flex-fill">
-                                            <i class="bi bi-person me-1"></i>Sign In to Review
-                                        </a>
-                                        <a href="{{ route('products.show', $product) }}" class="btn btn-outline-primary btn-sm flex-fill">
-                                            <i class="bi bi-eye me-1"></i>View Details
-                                        </a>
-                                    </div>
-                                </div>
-                            @endif
-                        @endauth
                     </div>
-
-                    <div class="card-footer bg-transparent border-top-0">
-                        @auth
-                            @if(auth()->user()->hasPermissionTo('edit_products'))
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <span class="text-muted">Stock: {{ $product->stock_quantity }}</span>
-                                    <div>
-                                        <a href="{{ route('products_edit', $product->id) }}" class="btn btn-sm btn-outline-primary">
-                                            <i class="bi bi-pencil me-1"></i> Edit
-                                        </a>
-                                        @if(auth()->user()->hasPermissionTo('delete_products'))
-                                            <a href="{{ route('products_delete', $product->id) }}" class="btn btn-sm btn-outline-danger ms-1"
-                                               onclick="return confirm('Are you sure you want to delete this product?')">
-                                                <i class="bi bi-trash me-1"></i> Delete
-                                            </a>
-                                        @endif
-                                    </div>
                                 </div>
-                            @endif
+                                </div>
+                        </div>
 
-                            @if(auth()->user()->hasRole('Customer'))
-                                <form action="{{ route('cart.add', $product) }}" method="POST">
-                                    @csrf
-                                    <div class="d-flex align-items-center">
-                                        <div class="input-group me-2">
-                                            <button type="button" class="btn btn-outline-secondary btn-sm quantity-btn" data-action="decrease">
-                                                <i class="bi bi-dash"></i>
-                                            </button>
-                                            <input type="number" name="quantity" value="1" min="1" max="{{ $product->stock_quantity }}"
-                                                   class="form-control form-control-sm text-center quantity-input" style="width: 50px;">
-                                            <button type="button" class="btn btn-outline-secondary btn-sm quantity-btn" data-action="increase" data-max="{{ $product->stock_quantity }}">
-                                                <i class="bi bi-plus"></i>
-                                            </button>
-                                        </div>
-                                        <button type="submit" class="btn btn-primary flex-grow-1 add-to-cart-btn" {{ $product->stock_quantity < 1 ? 'disabled' : '' }}>
-                                            <i class="bi bi-cart-plus me-1"></i>
-                                            {{ $product->stock_quantity < 1 ? 'Out of Stock' : 'Add to Cart' }}
-                                        </button>
-                                    </div>
-                                </form>
-                            @endif
-                        @endauth
-
-                        @guest
-                            <a href="{{ route('login') }}" class="btn btn-outline-primary w-100">
-                                <i class="bi bi-box-arrow-in-right me-1"></i> Login to Purchase
-                            </a>
-                        @endguest
-                    </div>
-                </div>
-            </div>
-            @endforeach
+        <!-- Active Filters -->
+        <div class="active-filters mb-4" id="activeFilters" style="display: none;">
+            <div class="d-flex flex-wrap gap-2" id="filterTags"></div>
         </div>
 
-        <!-- Empty state -->
-        @if(count($products) == 0)
-        <div class="text-center py-5">
-            <i class="bi bi-search" style="font-size: 3rem; color: #ccc;"></i>
-            <h3 class="mt-3">No products found</h3>
-            <p class="text-muted">Try adjusting your search criteria</p>
-            <a href="{{ route('products_list') }}" class="btn btn-outline-primary mt-2">Clear Filters</a>
+        <!-- Products Grid -->
+        <div class="row g-4">
+            @foreach($products as $product)
+            <div class="col-md-4 col-lg-3 product-item" data-price="{{ $product->price }}" data-rating="{{ $product->getAverageRating() }}" data-stock="{{ $product->isInStock() ? 'in_stock' : 'out_stock' }}">
+                <div class="tea-product-card" data-aos="fade-up" data-aos-delay="{{ $loop->index * 100 }}">
+                    <div class="tea-steam-wrapper">
+                        @for($i = 1; $i <= 5; $i++)
+                            <div class="steam" style="--i: {{ $i }}"></div>
+                        @endfor
+                    </div>
+                    <div class="product-image">
+                        <img src="{{ $product->getMainPhotoUrl() }}" alt="{{ $product->name }}" class="img-fluid">
+                        <div class="product-overlay">
+                            <div class="overlay-content">
+                                <a href="{{ route('products.show', $product) }}" class="btn btn-light btn-sm">
+                                    <i class="bi bi-eye"></i> Quick View
+                                    </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="product-info">
+                        <h5 class="product-title">{{ $product->name }}</h5>
+                        <p class="product-code">{{ $product->code }}</p>
+                        <p class="product-price">${{ number_format($product->price, 2) }}</p>
+                        <div class="product-rating">
+                            @php
+                                $avgRating = $product->comments->avg('rating') ?? 0;
+                                $ratingCount = $product->comments->count();
+                            @endphp
+                            <div class="stars">
+                                @for($i = 1; $i <= 5; $i++)
+                                    @if($i <= $avgRating)
+                                        <i class="bi bi-star-fill text-success"></i>
+                                    @else
+                                        <i class="bi bi-star text-success"></i>
+                        @endif
+                                @endfor
+                                <span class="rating-count ms-2">({{ $ratingCount }})</span>
+                            </div>
+                        </div>
+                        <div class="product-actions">
+                            <div class="d-flex gap-2">
+                                <a href="{{ route('products.show', $product) }}" class="btn btn-outline-success btn-sm flex-grow-1">
+                                    <i class="bi bi-eye"></i> View Details
+                                </a>
+                                @can('edit_products')
+                                <a href="{{ route('products_edit', $product) }}" class="btn btn-outline-primary btn-sm">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                @endcan
+                            </div>
+                        </div>
+                </div>
+            </div>
+        </div>
+        @endforeach
+    </div>
+
+        <!-- Pagination -->
+        @if($products->hasPages())
+        <div class="d-flex justify-content-center mt-5">
+            {{ $products->links() }}
         </div>
         @endif
     </div>
 </div>
 
-@push('scripts')
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Quantity buttons
-        const quantityBtns = document.querySelectorAll('.quantity-btn');
-        quantityBtns.forEach(btn => {
-            btn.addEventListener('click', function() {
-                const input = this.closest('.input-group').querySelector('.quantity-input');
-                const currentValue = parseInt(input.value);
-                const action = this.dataset.action;
-
-                if (action === 'decrease' && currentValue > 1) {
-                    input.value = currentValue - 1;
-                } else if (action === 'increase') {
-                    const max = parseInt(this.dataset.max);
-                    if (currentValue < max) {
-                        input.value = currentValue + 1;
-                    }
-                }
-            });
-        });
-
-        // Add to cart animation
-        const addToCartBtns = document.querySelectorAll('.add-to-cart-btn');
-        addToCartBtns.forEach(btn => {
-            btn.addEventListener('click', function() {
-                if (!this.disabled) {
-                    const card = this.closest('.product-card');
-                    card.classList.add('animate__animated', 'animate__pulse');
-
-                    setTimeout(() => {
-                        card.classList.remove('animate__animated', 'animate__pulse');
-                    }, 1000);
-                }
-            });
-        });
-
-        // Quick review form handling
-        const quickReviewForms = document.querySelectorAll('.quick-review-form');
-        quickReviewForms.forEach(form => {
-            form.addEventListener('submit', function(e) {
-                const submitBtn = this.querySelector('button[type="submit"]');
-                submitBtn.disabled = true;
-                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Submitting...';
-            });
-        });
-    });
-</script>
-
 <style>
-/* Quick rating styles */
-.rating-quick {
+/* Enhanced Green Tea Theme */
+.tea-garden {
+    position: relative;
+    min-height: 100vh;
+    background: var(--tea-bg-primary);
+    overflow: hidden;
+    padding: 2rem 0;
+}
+
+/* Enhanced Leaves Animation */
+.leaves-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 0;
+}
+
+.leaves {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+.leaves.falling .leaf {
+    position: absolute;
+    top: -50px;
+    left: calc(var(--start-pos) * 1%);
+    animation: fallingSideways 10s linear infinite;
+    animation-delay: calc(var(--delay) * 1s);
+    opacity: 0;
+    transform-origin: center;
+}
+
+.leaves.rising .leaf {
+    position: absolute;
+    bottom: -50px;
+    left: calc(var(--start-pos) * 1%);
+    animation: rising 15s linear infinite;
+    animation-delay: calc(var(--delay) * 1s);
+    opacity: 0;
+    transform-origin: center;
+}
+
+.leaf {
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+}
+
+.leaf-1 { font-size: 20px; }
+.leaf-2 { font-size: 24px; }
+.leaf-3 { font-size: 28px; }
+.leaf-4 { font-size: 32px; }
+
+@keyframes fallingSideways {
+    0% {
+        transform: translateY(-50px) rotate(0deg) scale(0.8);
+        opacity: 0;
+    }
+    10% {
+        opacity: 1;
+        transform: translateY(0) rotate(45deg) scale(1);
+    }
+    90% {
+        opacity: 1;
+        transform: translateY(100vh) rotate(315deg) scale(1);
+    }
+    100% {
+        transform: translateY(calc(100vh + 50px)) rotate(360deg) scale(0.8);
+        opacity: 0;
+    }
+}
+
+@keyframes rising {
+    0% {
+        transform: translateY(50px) rotate(0deg) scale(0.8);
+        opacity: 0;
+    }
+    10% {
+        opacity: 0.6;
+        transform: translateY(0) rotate(-45deg) scale(1);
+    }
+    90% {
+        opacity: 0;
+        transform: translateY(-100vh) rotate(-315deg) scale(1);
+    }
+    100% {
+        transform: translateY(calc(-100vh - 50px)) rotate(-360deg) scale(0.8);
+        opacity: 0;
+    }
+}
+
+/* Search Section */
+.search-section {
+    position: relative;
+    z-index: 2;
+    background: var(--tea-bg-secondary);
+    padding: 2rem;
+    border-radius: 0.5rem;
+    border: 1px solid var(--tea-border);
+    margin-bottom: 2rem;
+}
+
+.search-box {
+    position: relative;
     display: flex;
-    flex-direction: row-reverse;
-    justify-content: flex-end;
+    gap: 1rem;
 }
 
-.rating-quick input[type="radio"] {
-    display: none;
+.search-input {
+    flex-grow: 1;
+    background: var(--tea-bg-primary);
+    border: 1px solid var(--tea-border);
+    color: var(--tea-text-primary);
+    border-radius: 15px;
+    padding: 0.75rem 1.5rem;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
 }
 
-.rating-quick label.star-quick {
-    font-size: 1rem;
-    color: #ddd;
+.search-input:focus {
+    border-color: var(--tea-green-400);
+    box-shadow: 0 0 0 2px var(--tea-green-200);
+}
+
+.btn-filter {
+    background: var(--tea-bg-primary);
+    border: 1px solid var(--tea-border);
+    color: var(--tea-text-primary);
+    border-radius: 15px;
+    padding: 0.75rem 1.5rem;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-filter:hover {
+    background: var(--tea-hover);
+}
+
+.filter-panel {
+    background: var(--tea-bg-primary);
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    border: 1px solid var(--tea-border);
+}
+
+.rating-filter .form-check {
+    margin-bottom: 0.5rem;
+}
+
+.rating-filter .form-check-label {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.active-filters {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 15px;
+    padding: 1rem;
+    margin: 1rem 0;
+}
+
+.filter-tag {
+    background: var(--tea-bg-primary);
+    border: 1px solid var(--tea-border);
+    color: var(--tea-text-primary);
+    border-radius: 1rem;
+    padding: 0.25rem 0.75rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.filter-tag .close {
+    color: var(--tea-text-secondary);
     cursor: pointer;
-    margin: 0 1px;
-    transition: color 0.3s;
 }
 
-.rating-quick label.star-quick:hover,
-.rating-quick label.star-quick:hover ~ label.star-quick,
-.rating-quick input[type="radio"]:checked ~ label.star-quick {
-    color: #ffc107;
+.filter-tag .close:hover {
+    color: var(--tea-text-primary);
 }
 
-/* Product card enhancements */
-.product-card {
-    transition: transform 0.2s, box-shadow 0.2s;
+/* Enhanced Product Card Styling */
+.tea-product-card {
+    background: var(--tea-bg-secondary);
+    border: 1px solid var(--tea-border);
+    border-radius: 0.5rem;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    position: relative;
 }
 
-.product-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+.tea-product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
 }
 
-/* Comment section styles */
-.product-card .bg-light {
-    border-left: 3px solid #dee2e6;
+.product-image {
+    position: relative;
+    padding-top: 75%;
+    overflow: hidden;
 }
 
-.product-card .alert {
-    border: none;
-    border-radius: 6px;
+.product-image img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
-.product-card .border-top {
-    border-color: #e9ecef !important;
+.product-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
 }
 
-/* Button group spacing */
-.btn-group .btn {
-    border-radius: 4px !important;
+.tea-product-card:hover .product-overlay {
+    opacity: 1;
 }
 
-.btn-group .btn:not(:last-child) {
-    margin-right: 4px;
+.tea-product-card:hover .product-image img {
+    transform: scale(1.1);
 }
 
-/* Responsive adjustments */
+/* Enhanced Steam Animation */
+.tea-steam-wrapper {
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 30px;
+    overflow: hidden;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.tea-product-card:hover .tea-steam-wrapper {
+    opacity: 0.7;
+}
+
+.steam {
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    width: 2px;
+    height: 15px;
+    background: var(--tea-green-200);
+    border-radius: 10px;
+    animation: steam 2s infinite;
+    transform-origin: bottom;
+    opacity: 0;
+}
+
+@keyframes steam {
+    0% {
+        transform: translateY(0) scaleX(1);
+        opacity: 0;
+    }
+    15% {
+        opacity: 1;
+    }
+    50% {
+        transform: translateY(-10px) scaleX(3);
+    }
+    95% {
+        opacity: 0;
+    }
+    100% {
+        transform: translateY(-20px) scaleX(4);
+        opacity: 0;
+    }
+}
+
+.steam:nth-child(1) { animation-delay: 0.2s; }
+.steam:nth-child(2) { animation-delay: 0.4s; }
+.steam:nth-child(3) { animation-delay: 0.6s; }
+.steam:nth-child(4) { animation-delay: 0.8s; }
+.steam:nth-child(5) { animation-delay: 1s; }
+
+/* Enhanced Product Info */
+.product-info {
+    padding: 1rem;
+}
+
+.product-title {
+    color: var(--tea-text-primary);
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+.product-code {
+    color: var(--tea-text-secondary);
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+}
+
+.product-price {
+    color: var(--tea-green-600);
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.product-rating {
+    margin-bottom: 1rem;
+}
+
+.stars {
+    color: #4caf50;
+    font-size: 1.1rem;
+}
+
+.rating-count {
+    color: var(--tea-text-secondary);
+    font-size: 0.9rem;
+}
+
+.product-actions {
+    margin-top: 1rem;
+}
+
+/* Button Styles */
+.btn-outline-success {
+    color: var(--tea-green-600);
+    border-color: var(--tea-green-600);
+}
+
+.btn-outline-success:hover {
+    background: var(--tea-green-600);
+    color: white;
+}
+
+.btn-outline-primary {
+    color: var(--tea-blue-600);
+    border-color: var(--tea-blue-600);
+}
+
+.btn-outline-primary:hover {
+    background: var(--tea-blue-600);
+    color: white;
+}
+
+/* Pagination */
+.pagination {
+    margin-top: 2rem;
+}
+
+.page-link {
+    background: var(--tea-bg-secondary);
+    border: 1px solid var(--tea-border);
+    color: var(--tea-text-primary);
+}
+
+.page-link:hover {
+    background: var(--tea-hover);
+    color: var(--tea-text-primary);
+    border-color: var(--tea-border);
+}
+
+.page-item.active .page-link {
+    background: var(--tea-green-600);
+    border-color: var(--tea-green-700);
+    color: white;
+}
+
+.page-item.disabled .page-link {
+    background: var(--tea-bg-secondary);
+    border-color: var(--tea-border);
+    color: var(--tea-text-secondary);
+}
+
+/* Responsive Design */
 @media (max-width: 768px) {
-    .product-card .d-flex.gap-2 {
+    .search-box {
         flex-direction: column;
     }
     
-    .product-card .d-flex.gap-2 .btn {
-        margin-bottom: 4px;
+    .btn-filter {
+        width: 100%;
+    }
+    
+    .product-actions {
+        flex-direction: column;
+    }
+    
+    .product-actions .btn {
+        width: 100%;
+        margin-bottom: 0.5rem;
     }
 }
 </style>
-@endpush
 
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Create continuous stream of leaves
+    function createLeaves() {
+        const fallingLeaves = document.querySelector('.leaves.falling');
+        const risingLeaves = document.querySelector('.leaves.rising');
+        
+        setInterval(() => {
+            const leaf = document.createElement('div');
+            leaf.className = `leaf leaf-${Math.floor(Math.random() * 4) + 1}`;
+            leaf.style.setProperty('--start-pos', `${Math.random() * 100}`);
+            leaf.style.setProperty('--delay', '0');
+            
+            const leafContent = ['🍃', '🌿', '☘️', '🍂'][Math.floor(Math.random() * 4)];
+            leaf.textContent = leafContent;
+            
+            if (Math.random() > 0.7) { // 30% chance for rising leaves
+                risingLeaves.appendChild(leaf);
+                leaf.addEventListener('animationend', () => risingLeaves.removeChild(leaf));
+            } else {
+                fallingLeaves.appendChild(leaf);
+                leaf.addEventListener('animationend', () => fallingLeaves.removeChild(leaf));
+            }
+        }, 300); // Create new leaf every 300ms
+    }
+
+    createLeaves();
+
+    // Initialize AOS
+    AOS.init({
+        duration: 800,
+        easing: 'ease-out',
+        once: true
+    });
+
+    // Search input animation
+    const searchInput = document.querySelector('.search-input');
+    if (searchInput) {
+        searchInput.addEventListener('focus', () => {
+            searchInput.parentElement.classList.add('focused');
+        });
+        searchInput.addEventListener('blur', () => {
+            searchInput.parentElement.classList.remove('focused');
+        });
+    }
+
+    // Filter functionality
+    const filterForm = document.getElementById('filterForm');
+    const activeFilters = document.getElementById('activeFilters');
+    const filterTags = document.getElementById('filterTags');
+    const productItems = document.querySelectorAll('.product-item');
+    
+    filterForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        const filters = {};
+        
+        for (const [key, value] of formData.entries()) {
+            filters[key] = value;
+        }
+        
+        // Apply filters
+        productItems.forEach(item => {
+            const price = parseFloat(item.dataset.price);
+            const rating = parseFloat(item.dataset.rating);
+            const stock = item.dataset.stock;
+            let visible = true;
+            
+            // Price filter
+            if (filters.price_min && price < parseFloat(filters.price_min)) visible = false;
+            if (filters.price_max && price > parseFloat(filters.price_max)) visible = false;
+            
+            // Stock filter
+            if (filters.stock !== 'all' && stock !== filters.stock) visible = false;
+            
+            // Rating filter
+            if (filters.rating && filters.rating.length > 0) {
+                const minRating = Math.min(...filters.rating);
+                if (rating < minRating) visible = false;
+            }
+            
+            item.style.display = visible ? '' : 'none';
+        });
+
+        // Update active filters display
+        updateActiveFilters(filters);
+    });
+    
+    // Search functionality
+    const searchInput = document.getElementById('searchInput');
+    searchInput.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        
+        productItems.forEach(item => {
+            const productName = item.querySelector('.product-title').textContent.toLowerCase();
+            const visible = productName.includes(searchTerm);
+            item.style.display = visible ? '' : 'none';
+        });
+    });
+
+    function updateActiveFilters(filters) {
+        filterTags.innerHTML = '';
+        let hasFilters = false;
+        
+        if (filters.price_min || filters.price_max) {
+            hasFilters = true;
+            addFilterTag(`Price: $${filters.price_min || '0'} - $${filters.price_max || '∞'}`);
+        }
+        
+        if (filters.stock && filters.stock !== 'all') {
+            hasFilters = true;
+            addFilterTag(`Stock: ${filters.stock.replace('_', ' ').toUpperCase()}`);
+        }
+        
+        if (filters.rating && filters.rating.length > 0) {
+            hasFilters = true;
+            addFilterTag(`Rating: ${Math.min(...filters.rating)}+ Stars`);
+        }
+        
+        activeFilters.style.display = hasFilters ? 'block' : 'none';
+    }
+    
+    function addFilterTag(text) {
+        const tag = document.createElement('span');
+        tag.className = 'filter-tag';
+        tag.innerHTML = `
+            ${text}
+            <span class="close">
+                <i class="bi bi-x"></i>
+            </span>
+        `;
+        filterTags.appendChild(tag);
+    }
+    
+    // Reset filters
+    filterForm.addEventListener('reset', function() {
+        setTimeout(() => {
+            productItems.forEach(item => item.style.display = '');
+            activeFilters.style.display = 'none';
+            filterTags.innerHTML = '';
+        }, 0);
+    });
+});
+</script>
 @endsection

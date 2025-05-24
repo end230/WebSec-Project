@@ -28,6 +28,11 @@ class ProductComment extends Model
         'updated_at' => 'datetime',
     ];
 
+    protected $attributes = [
+        'is_approved' => true,
+        'approved_at' => null,
+    ];
+
     /**
      * Get the product that this comment belongs to
      */

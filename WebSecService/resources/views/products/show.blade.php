@@ -3,325 +3,197 @@
 @section('title', $product->name)
 
 @section('content')
-<div class="container py-4">
+<div class="tea-garden-details">
+    <!-- Enhanced Falling Leaves Animation -->
+    <div class="leaves">
+        @for($i = 1; $i <= 40; $i++)
+            <div class="leaf leaf-{{ rand(1, 4) }}" style="--i: {{ $i }}">
+                @switch(rand(1, 4))
+                    @case(1) 🍃 @break
+                    @case(2) 🌿 @break
+                    @case(3) ☘️ @break
+                    @case(4) 🍂 @break
+                @endswitch
+            </div>
+        @endfor
+    </div>
+
+    <div class="container py-5">
+        <div class="product-details-card">
+            <!-- Product Header -->
+            <div class="product-header">
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{{ url('/') }}">Home</a></li>
             <li class="breadcrumb-item"><a href="{{ route('products_list') }}">Products</a></li>
-            <li class="breadcrumb-item active" aria-current="page">{{ $product->name }}</li>
+                        <li class="breadcrumb-item active">{{ $product->name }}</li>
         </ol>
     </nav>
+            </div>
 
+            <!-- Product Content -->
     <div class="row">
-        <div class="col-md-5">
-            <div class="card mb-4">
-                <div class="card-body text-center p-4">
-                    @if($product->image)
-                        <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" class="img-fluid rounded">
-                    @else
-                        <div class="bg-light rounded p-5 d-flex align-items-center justify-content-center" style="height: 300px;">
-                            <span class="text-muted fs-3">No image available</span>
+                <!-- Product Images -->
+                <div class="col-lg-6">
+                    <div class="product-gallery">
+                        <div class="main-image">
+                            <img src="{{ $product->getMainPhotoUrl() }}" alt="{{ $product->name }}" class="img-fluid">
+                            <div class="tea-steam-wrapper">
+                                @for($i = 1; $i <= 7; $i++)
+                                    <div class="steam" style="--i: {{ $i }}"></div>
+                                @endfor
+                            </div>
+                        </div>
+                        @if($product->additional_photos)
+                            <div class="thumbnail-gallery mt-3">
+                                @foreach($product->getAllPhotoUrls() as $photo)
+                                    <div class="thumbnail">
+                                        <img src="{{ $photo }}" alt="{{ $product->name }}" class="img-fluid">
+                                    </div>
+                                @endforeach
                         </div>
                     @endif
                 </div>
             </div>
-        </div>
-        <div class="col-md-7">
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h2 class="mb-0">{{ $product->name }}</h2>
+
+                <!-- Product Info -->
+                <div class="col-lg-6">
+                    <div class="product-info">
+                        <h1 class="product-title">{{ $product->name }}</h1>
+                        <div class="product-meta">
+                            <span class="product-code">Code: {{ $product->code }}</span>
+                            <span class="product-model">Model: {{ $product->model }}</span>
                 </div>
-                <div class="card-body">
-                    <h3 class="text-primary mb-4">${{ number_format($product->price, 2) }}</h3>
-                    
-                    <!-- Rating Summary -->
-                    @if($product->getReviewCount() > 0)
-                        <div class="mb-4">
-                            <div class="d-flex align-items-center">
+
+                        <div class="product-rating mt-3">
+                            @php
+                                $avgRating = $product->getAverageRating();
+                                $reviewCount = $product->getReviewCount();
+                            @endphp
+                            <div class="stars">
                                 @for($i = 1; $i <= 5; $i++)
-                                    @if($i <= round($product->getAverageRating()))
-                                        <i class="bi bi-star-fill text-warning"></i>
+                                    @if($i <= $avgRating)
+                                        <i class="bi bi-star-fill text-success"></i>
                                     @else
-                                        <i class="bi bi-star text-muted"></i>
+                                        <i class="bi bi-star text-success"></i>
                                     @endif
                                 @endfor
-                                <span class="ms-2">
-                                    {{ number_format($product->getAverageRating(), 1) }} out of 5 
-                                    ({{ $product->getReviewCount() }} {{ $product->getReviewCount() === 1 ? 'review' : 'reviews' }})
-                                </span>
+                                <span class="rating-count">({{ $reviewCount }} reviews)</span>
                             </div>
                         </div>
-                    @endif
                     
-                    <div class="mb-4">
-                        <h5>Description</h5>
-                        <p>{{ $product->description ?: 'No description available.' }}</p>
-                    </div>
-                    
-                    <div class="mb-4">
-                        <h5>Stock Status</h5>
-                        @if($product->in_stock)
-                            <span class="badge bg-success">In Stock</span>
+                        <div class="product-price mt-4">
+                            <span class="price">${{ number_format($product->price, 2) }}</span>
+                            @if($product->isInStock())
+                                <span class="stock-badge in-stock">
+                                    <i class="bi bi-check-circle-fill"></i> In Stock
+                                </span>
                         @else
-                            <span class="badge bg-danger">Out of Stock</span>
+                                <span class="stock-badge out-of-stock">
+                                    <i class="bi bi-x-circle-fill"></i> Out of Stock
+                                </span>
                         @endif
                     </div>
                     
-                    @if($product->in_stock)
-                        <form action="{{ route('cart.add', $product->id) }}" method="POST" class="add-to-cart-form">
-                            @csrf
-                            <div class="row g-3 align-items-center mb-3">
-                                <div class="col-auto">
-                                    <label for="quantity" class="col-form-label">Quantity:</label>
-                                </div>
-                                <div class="col-md-2">
-                                    <input type="number" id="quantity" name="quantity" class="form-control" value="1" min="1" max="100">
-                                </div>
-                                <div class="col-auto">
-                                    <button type="submit" class="btn btn-primary add-to-cart-btn">
-                                        <i class="bi bi-cart-plus me-1"></i> Add to Cart
-                                    </button>
-                                </div>
-                            </div>
-                        </form>
-                    @endif
-                    
-                    @if(auth()->check() && auth()->user()->hasPermissionTo('edit_products'))
-                        <div class="mt-4">
-                            <a href="{{ route('products_edit', $product) }}" class="btn btn-secondary me-2">
-                                <i class="bi bi-pencil me-1"></i> Edit Product
-                            </a>
-                            <form action="{{ route('products_delete', $product) }}" method="POST" class="d-inline delete-form">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this product?')">
-                                    <i class="bi bi-trash me-1"></i> Delete Product
-                                </button>
-                            </form>
+                        <div class="product-description mt-4">
+                            <h5>Description</h5>
+                            <p>{{ $product->description }}</p>
                         </div>
-                    @endif
-                </div>
+
+                        @auth
+                            <div class="product-actions mt-4">
+                                <form action="{{ route('cart.add', $product) }}" method="POST" class="d-flex gap-3">
+                            @csrf
+                                    <div class="quantity-control">
+                                        <button type="button" class="btn-quantity" data-action="decrease">-</button>
+                                        <input type="number" name="quantity" value="1" min="1" max="{{ $product->stock_quantity }}" class="quantity-input">
+                                        <button type="button" class="btn-quantity" data-action="increase">+</button>
+                                </div>
+                                    <button type="submit" class="btn btn-success flex-grow-1" {{ !$product->isInStock() ? 'disabled' : '' }}>
+                                        <i class="bi bi-cart-plus"></i> Add to Cart
+                                    </button>
+                                </form>
+                            </div>
+                        @else
+                        <div class="mt-4">
+                                <a href="{{ route('login') }}" class="btn btn-outline-success">
+                                    <i class="bi bi-box-arrow-in-right"></i> Login to Purchase
+                                </a>
+                        </div>
+                        @endauth
             </div>
         </div>
     </div>
 
     <!-- Reviews Section -->
-    <div class="row mt-4">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <h4 class="mb-0">
-                        <i class="bi bi-chat-left-text me-2"></i>Customer Reviews
-                        @if($product->getReviewCount() > 0)
-                            <span class="badge bg-primary ms-2">{{ $product->getReviewCount() }}</span>
-                        @endif
-                    </h4>
-                </div>
-                <div class="card-body">
-                    <!-- Review Form -->
+            <div class="reviews-section mt-5">
+                <h3 class="section-title">Customer Reviews</h3>
+                
                     @auth
                         @if($hasPurchased && !$existingComment)
-                            <!-- User has purchased and can review -->
-                            <div class="alert alert-info mb-4">
-                                <i class="bi bi-info-circle me-2"></i>
-                                You've purchased this product! Share your experience to help other customers.
-                            </div>
-                            
-                            <form action="{{ route('products.comments.store', $product) }}" method="POST" class="mb-4">
+                        <div class="review-form-card">
+                            <h4>Write a Review</h4>
+                            <form action="{{ route('products.comments.store', $product) }}" method="POST">
                                 @csrf
-                                <div class="card">
-                                    <div class="card-header">
-                                        <h5 class="mb-0">Write a Review</h5>
-                                    </div>
-                                    <div class="card-body">
-                                        <!-- Rating -->
-                                        <div class="mb-3">
-                                            <label class="form-label">Rating *</label>
-                                            <div class="rating-input">
+                                <div class="rating-input mb-3">
+                                    <label class="form-label">Rating</label>
+                                    <div class="stars-input">
                                                 @for($i = 5; $i >= 1; $i--)
                                                     <input type="radio" name="rating" value="{{ $i }}" id="star{{ $i }}" required>
-                                                    <label for="star{{ $i }}" class="star">
+                                            <label for="star{{ $i }}">
                                                         <i class="bi bi-star-fill"></i>
                                                     </label>
                                                 @endfor
-                                            </div>
-                                            @error('rating')
-                                                <div class="text-danger small">{{ $message }}</div>
-                                            @enderror
-                                        </div>
-                                        
-                                        <!-- Comment -->
-                                        <div class="mb-3">
-                                            <label for="comment" class="form-label">Your Review *</label>
-                                            <textarea name="comment" id="comment" class="form-control" rows="4" 
-                                                placeholder="Share your experience with this product..." 
-                                                maxlength="1000" required>{{ old('comment') }}</textarea>
-                                            @error('comment')
-                                                <div class="text-danger small">{{ $message }}</div>
-                                            @enderror
-                                        </div>
-                                        
-                                        <button type="submit" class="btn btn-primary">
-                                            <i class="bi bi-send me-1"></i>Submit Review
-                                        </button>
                                     </div>
                                 </div>
-                            </form>
-                        @elseif($existingComment)
-                            <!-- User has already reviewed -->
-                            <div class="alert alert-success mb-4">
-                                <i class="bi bi-check-circle me-2"></i>
-                                Thank you! You have already reviewed this product.
-                            </div>
-                            
-                            <!-- Show disabled form with their existing review -->
-                            <div class="card mb-4">
-                                <div class="card-header">
-                                    <h5 class="mb-0">Your Review</h5>
+                                    <div class="mb-3">
+                                    <label for="comment" class="form-label">Your Review</label>
+                                    <textarea name="comment" id="comment" rows="4" class="form-control" required></textarea>
                                 </div>
-                                <div class="card-body">
-                                    <div class="mb-3">
-                                        <label class="form-label">Your Rating</label>
-                                        <div class="d-flex align-items-center">
-                                            @for($i = 1; $i <= 5; $i++)
-                                                @if($i <= $existingComment->rating)
-                                                    <i class="bi bi-star-fill text-warning"></i>
-                                                @else
-                                                    <i class="bi bi-star text-muted"></i>
-                                                @endif
-                                            @endfor
-                                            <span class="ms-2 fw-bold">{{ $existingComment->rating }}/5</span>
-                                        </div>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label class="form-label">Your Review</label>
-                                        <div class="p-3 bg-light rounded">
-                                            {{ $existingComment->comment }}
-                                        </div>
-                                    </div>
-                                    <small class="text-muted">
-                                        Reviewed on {{ $existingComment->created_at->format('M d, Y') }}
-                                    </small>
-                                </div>
-                            </div>
-                        @elseif(!$hasPurchased)
-                            <!-- User hasn't purchased - show disabled form with message -->
-                            <div class="alert alert-warning mb-4">
-                                <i class="bi bi-exclamation-triangle me-2"></i>
-                                You can only review products you have purchased and received.
-                            </div>
-                            
-                            <div class="card mb-4 opacity-75">
-                                <div class="card-header">
-                                    <h5 class="mb-0">Write a Review</h5>
-                                </div>
-                                <div class="card-body">
-                                    <!-- Disabled Rating -->
-                                    <div class="mb-3">
-                                        <label class="form-label">Rating *</label>
-                                        <div class="rating-input-disabled">
-                                            @for($i = 5; $i >= 1; $i--)
-                                                <span class="star-disabled">
-                                                    <i class="bi bi-star text-muted"></i>
-                                                </span>
-                                            @endfor
-                                        </div>
-                                    </div>
-                                    
-                                    <!-- Disabled Comment -->
-                                    <div class="mb-3">
-                                        <label for="comment-disabled" class="form-label">Your Review *</label>
-                                        <textarea id="comment-disabled" class="form-control" rows="4" 
-                                            placeholder="Purchase this product to leave a review..." 
-                                            disabled readonly></textarea>
-                                    </div>
-                                    
-                                    <button type="button" class="btn btn-secondary" disabled>
-                                        <i class="bi bi-lock me-1"></i>Purchase Required to Review
+                                <button type="submit" class="btn btn-success">
+                                    <i class="bi bi-send"></i> Submit Review
                                     </button>
-                                </div>
-                            </div>
-                        @endif
-                    @else
-                        <!-- Guest user - show disabled form with login prompt -->
-                        <div class="alert alert-info mb-4">
-                            <i class="bi bi-info-circle me-2"></i>
-                            <a href="{{ route('login') }}">Sign in</a> to write a review for this product.
+                            </form>
                         </div>
-                        
-                        <div class="card mb-4 opacity-75">
-                            <div class="card-header">
-                                <h5 class="mb-0">Write a Review</h5>
-                            </div>
-                            <div class="card-body">
-                                <!-- Disabled Rating -->
-                                <div class="mb-3">
-                                    <label class="form-label">Rating *</label>
-                                    <div class="rating-input-disabled">
-                                        @for($i = 5; $i >= 1; $i--)
-                                            <span class="star-disabled">
-                                                <i class="bi bi-star text-muted"></i>
-                                            </span>
-                                        @endfor
+                    @endif
+                @endauth
+
+                <!-- Reviews List -->
+                <div class="reviews-list mt-4">
+                    @forelse($comments as $comment)
+                        <div class="review-card" data-aos="fade-up">
+                            <div class="review-header">
+                                <div class="reviewer-info">
+                                    <div class="avatar">{{ substr($comment->user->name, 0, 1) }}</div>
+                                    <div class="reviewer-meta">
+                                        <h5>{{ $comment->user->name }}</h5>
+                                        <span class="review-date">{{ $comment->created_at->format('M d, Y') }}</span>
                                     </div>
                                 </div>
-                                
-                                <!-- Disabled Comment -->
-                                <div class="mb-3">
-                                    <label for="comment-guest" class="form-label">Your Review *</label>
-                                    <textarea id="comment-guest" class="form-control" rows="4" 
-                                        placeholder="Sign in to leave a review..." 
-                                        disabled readonly></textarea>
-                                </div>
-                                
-                                <a href="{{ route('login') }}" class="btn btn-primary">
-                                    <i class="bi bi-box-arrow-in-right me-1"></i>Sign In to Review
-                                </a>
-                            </div>
-                        </div>
-                    @endauth
-                    
-                    <!-- Existing Reviews -->
-                    @if($comments->count() > 0)
-                        <h5 class="mb-3">Customer Reviews</h5>
-                        @foreach($comments as $comment)
-                            <div class="card mb-3">
-                                <div class="card-body">
-                                    <div class="d-flex justify-content-between align-items-start mb-2">
-                                        <div>
-                                            <h6 class="mb-1">{{ $comment->user->name }}</h6>
-                                            <div class="d-flex align-items-center mb-2">
+                                <div class="review-rating">
                                                 @for($i = 1; $i <= 5; $i++)
                                                     @if($i <= $comment->rating)
-                                                        <i class="bi bi-star-fill text-warning"></i>
+                                            <i class="bi bi-star-fill text-success"></i>
                                                     @else
-                                                        <i class="bi bi-star text-muted"></i>
+                                            <i class="bi bi-star text-success"></i>
                                                     @endif
                                                 @endfor
-                                                <span class="ms-2 fw-bold">{{ $comment->rating }}/5</span>
-                                                @if($comment->is_verified_purchase)
-                                                    <span class="badge bg-success ms-2">Verified Purchase</span>
-                                                @endif
-                                            </div>
-                                        </div>
-                                        <small class="text-muted">{{ $comment->created_at->diffForHumans() }}</small>
-                                    </div>
-                                    <p class="mb-0">{{ $comment->comment }}</p>
                                 </div>
                             </div>
-                        @endforeach
-                        
-                        <!-- Pagination -->
-                        @if($comments->hasPages())
-                            <div class="d-flex justify-content-center">
-                                {{ $comments->links() }}
+                            <div class="review-content">
+                                <p>{{ $comment->comment }}</p>
                             </div>
-                        @endif
-                    @else
-                        <div class="text-center py-4">
-                            <i class="bi bi-chat-left-text text-muted" style="font-size: 3rem;"></i>
-                            <h5 class="text-muted mt-3">No reviews yet</h5>
+                        </div>
+                    @empty
+                        <div class="no-reviews text-center py-5">
+                            <i class="bi bi-chat-square-text display-4 text-muted"></i>
+                            <h4 class="mt-3">No Reviews Yet</h4>
                             <p class="text-muted">Be the first to review this product!</p>
+                        </div>
+                    @endforelse
+
+                    @if($comments->hasPages())
+                        <div class="d-flex justify-content-center mt-4">
+                            {{ $comments->links() }}
                         </div>
                     @endif
                 </div>
@@ -331,130 +203,418 @@
 </div>
 
 <style>
-.rating-input {
-    display: flex;
-    flex-direction: row-reverse;
-    justify-content: flex-end;
+/* Enhanced Green Tea Theme for Details Page */
+.tea-garden-details {
+    position: relative;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #f1f8e9 0%, #dcedc8 50%, #c8e6c9 100%);
+    overflow: hidden;
 }
 
-.rating-input input[type="radio"] {
+/* Enhanced Falling Leaves Animation */
+.leaves {
+    position: fixed;
+    top: -10%;
+    left: 0;
+    width: 100%;
+    height: 120%;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.leaf {
+    position: absolute;
+    animation: falling 15s linear infinite;
+    opacity: 0.7;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+}
+
+.leaf-1 { font-size: 20px; }
+.leaf-2 { font-size: 24px; }
+.leaf-3 { font-size: 28px; }
+.leaf-4 { font-size: 32px; }
+
+@keyframes falling {
+    0% {
+        transform: translateX(var(--x-start)) translateY(-10%) rotate(0deg);
+        opacity: 0;
+    }
+    10% {
+        opacity: 0.7;
+    }
+    90% {
+        opacity: 0.7;
+    }
+    100% {
+        transform: translateX(var(--x-end)) translateY(110vh) rotate(360deg);
+        opacity: 0;
+    }
+}
+
+/* Product Details Card */
+.product-details-card {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 30px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+    position: relative;
+    z-index: 2;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Product Gallery */
+.product-gallery {
+    position: relative;
+}
+
+.main-image {
+    position: relative;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.main-image img {
+    width: 100%;
+    height: auto;
+    transition: transform 0.5s ease;
+}
+
+.main-image:hover img {
+    transform: scale(1.05);
+}
+
+.thumbnail-gallery {
+    display: flex;
+    gap: 1rem;
+    overflow-x: auto;
+    padding: 1rem 0;
+}
+
+.thumbnail {
+    flex: 0 0 80px;
+    height: 80px;
+    border-radius: 10px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.thumbnail:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.thumbnail img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Enhanced Steam Animation */
+.tea-steam-wrapper {
+    position: absolute;
+    top: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px;
+    height: 80px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.main-image:hover .tea-steam-wrapper {
+    opacity: 1;
+}
+
+.steam {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 8px;
+    height: 50px;
+    background: rgba(255, 255, 255, 0.6);
+    border-radius: 10px;
+    animation: steaming 3s infinite;
+    opacity: 0;
+    filter: blur(5px);
+}
+
+@keyframes steaming {
+    0% {
+        transform: translateY(0) translateX(-50%) scale(1);
+        opacity: 0;
+    }
+    50% {
+        opacity: 0.8;
+    }
+    100% {
+        transform: translateY(-40px) translateX(-50%) scale(2);
+        opacity: 0;
+    }
+}
+
+.steam:nth-child(1) { animation-delay: 0.2s; }
+.steam:nth-child(2) { animation-delay: 0.4s; }
+.steam:nth-child(3) { animation-delay: 0.6s; }
+.steam:nth-child(4) { animation-delay: 0.8s; }
+.steam:nth-child(5) { animation-delay: 1.0s; }
+.steam:nth-child(6) { animation-delay: 1.2s; }
+.steam:nth-child(7) { animation-delay: 1.4s; }
+
+/* Product Info Styling */
+.product-title {
+    font-size: 2rem;
+    color: #2e7d32;
+    margin-bottom: 1rem;
+}
+
+.product-meta {
+    display: flex;
+    gap: 1.5rem;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.product-price {
+    font-size: 2rem;
+    color: #1b5e20;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.stock-badge {
+    font-size: 0.9rem;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.stock-badge.in-stock {
+    background: #c8e6c9;
+    color: #2e7d32;
+}
+
+.stock-badge.out-of-stock {
+    background: #ffcdd2;
+    color: #c62828;
+}
+
+/* Quantity Control */
+.quantity-control {
+    display: flex;
+    align-items: center;
+    background: #f5f5f5;
+    border-radius: 25px;
+    padding: 0.5rem;
+}
+
+.btn-quantity {
+    width: 40px;
+    height: 40px;
+    border: none;
+    background: white;
+    border-radius: 20px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-quantity:hover {
+    background: #4caf50;
+    color: white;
+}
+
+.quantity-input {
+    width: 60px;
+    text-align: center;
+    border: none;
+    background: none;
+    font-size: 1.1rem;
+    font-weight: 500;
+}
+
+/* Reviews Section */
+.reviews-section {
+    margin-top: 4rem;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.section-title {
+    color: #2e7d32;
+    margin-bottom: 2rem;
+}
+
+.review-card {
+    background: white;
+    border-radius: 15px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease;
+}
+
+.review-card:hover {
+    transform: translateY(-5px);
+}
+
+.review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+}
+
+.reviewer-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.avatar {
+    width: 40px;
+    height: 40px;
+    background: #4caf50;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+}
+
+.reviewer-meta h5 {
+    margin: 0;
+    color: #2e7d32;
+}
+
+.review-date {
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.review-rating {
+    color: #4caf50;
+}
+
+.review-content {
+    color: #333;
+    line-height: 1.6;
+}
+
+/* Review Form */
+.review-form-card {
+    background: white;
+    border-radius: 15px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.stars-input {
+    display: flex;
+    flex-direction: row-reverse;
+    gap: 0.5rem;
+}
+
+.stars-input input {
     display: none;
 }
 
-.rating-input label.star {
+.stars-input label {
+    cursor: pointer;
     font-size: 1.5rem;
     color: #ddd;
-    cursor: pointer;
-    margin: 0 2px;
-    transition: color 0.3s;
+    transition: all 0.2s ease;
 }
 
-.rating-input label.star:hover,
-.rating-input label.star:hover ~ label.star,
-.rating-input input[type="radio"]:checked ~ label.star {
-    color: #ffc107;
+.stars-input label:hover,
+.stars-input label:hover ~ label,
+.stars-input input:checked ~ label {
+    color: #4caf50;
 }
 
-/* Disabled rating styles */
-.rating-input-disabled {
-    display: flex;
-    justify-content: flex-start;
+/* Responsive Design */
+@media (max-width: 768px) {
+    .product-details-card {
+        padding: 1rem;
 }
 
-.rating-input-disabled .star-disabled {
+    .product-title {
     font-size: 1.5rem;
-    margin: 0 2px;
-    cursor: not-allowed;
 }
 
-.rating-input-disabled .star-disabled i {
-    color: #dee2e6 !important;
+    .product-price {
+        font-size: 1.5rem;
 }
 
-/* Disabled card styles */
-.card.opacity-75 {
-    position: relative;
+    .product-actions {
+        flex-direction: column;
 }
 
-.card.opacity-75::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(255, 255, 255, 0.7);
-    z-index: 1;
-    border-radius: 0.375rem;
-    pointer-events: none;
-}
-
-.card.opacity-75 .card-body {
-    position: relative;
-    z-index: 2;
+    .quantity-control {
+        margin-bottom: 1rem;
+    }
 }
 </style>
-@endsection
 
-@section('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const addToCartForms = document.querySelectorAll('.add-to-cart-form');
-        
-        addToCartForms.forEach(form => {
-            form.addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                const btn = this.querySelector('.add-to-cart-btn');
-                const formData = new FormData(this);
-                
-                // Show loading state
-                const originalBtnText = btn.innerHTML;
-                btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Adding...';
-                btn.disabled = true;
-                
-                fetch(this.action, {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest'
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        // Show success animation
-                        btn.innerHTML = '<i class="bi bi-check-lg"></i> Added!';
-                        btn.classList.remove('btn-primary');
-                        btn.classList.add('btn-success');
-                        
-                        // Update cart count if applicable
-                        if (data.cartCount) {
-                            const cartCountElement = document.querySelector('.cart-count');
-                            if (cartCountElement) {
-                                cartCountElement.textContent = data.cartCount;
-                            }
-                        }
-                        
-                        // Reset button after delay
-                        setTimeout(() => {
-                            btn.innerHTML = originalBtnText;
-                            btn.classList.remove('btn-success');
-                            btn.classList.add('btn-primary');
-                            btn.disabled = false;
-                        }, 2000);
-                    } else {
-                        alert(data.message || 'Failed to add product to cart.');
-                        btn.innerHTML = originalBtnText;
-                        btn.disabled = false;
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('An error occurred while adding the product to cart.');
-                    btn.innerHTML = originalBtnText;
-                    btn.disabled = false;
-                });
+    // Initialize AOS
+    AOS.init({
+        duration: 800,
+        easing: 'ease-out',
+        once: true
+    });
+
+    // Enhanced leaf animation
+    const leaves = document.querySelectorAll('.leaf');
+    leaves.forEach(leaf => {
+        const randomStart = Math.random() * 100;
+        const randomEnd = Math.random() * 100;
+        const randomRotation = Math.random() * 360;
+        const randomDelay = Math.random() * 15;
+        const randomDuration = 15 + Math.random() * 5;
+
+        leaf.style.setProperty('--x-start', `${randomStart}%`);
+        leaf.style.setProperty('--x-end', `${randomEnd}%`);
+        leaf.style.setProperty('--rotation', `${randomRotation}deg`);
+        leaf.style.animationDelay = `${randomDelay}s`;
+        leaf.style.animationDuration = `${randomDuration}s`;
+    });
+
+    // Quantity control
+    const quantityBtns = document.querySelectorAll('.btn-quantity');
+    quantityBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const input = this.parentElement.querySelector('.quantity-input');
+            const currentValue = parseInt(input.value);
+            const maxValue = parseInt(input.getAttribute('max'));
+            
+            if (this.dataset.action === 'increase' && currentValue < maxValue) {
+                input.value = currentValue + 1;
+            } else if (this.dataset.action === 'decrease' && currentValue > 1) {
+                input.value = currentValue - 1;
+            }
+        });
+    });
+
+    // Thumbnail gallery
+    const thumbnails = document.querySelectorAll('.thumbnail img');
+    const mainImage = document.querySelector('.main-image img');
+    
+    thumbnails.forEach(thumb => {
+        thumb.addEventListener('click', function() {
+            mainImage.src = this.src;
+            thumbnails.forEach(t => t.parentElement.classList.remove('active'));
+            this.parentElement.classList.add('active');
             });
         });
     });
