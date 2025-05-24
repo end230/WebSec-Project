@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: May 23, 2025 at 09:51 PM
--- Server version: 10.4.28-MariaDB
--- PHP Version: 8.2.4
+-- Generation Time: May 24, 2025 at 09:41 PM
+-- Server version: 10.4.32-MariaDB
+-- PHP Version: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -18,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `websecproject`
+-- Database: `project_websec`
 --
 
 -- --------------------------------------------------------
@@ -70,7 +70,12 @@ CREATE TABLE `case_activities` (
 --
 
 INSERT INTO `case_activities` (`id`, `case_id`, `user_id`, `activity_type`, `title`, `description`, `metadata`, `is_customer_visible`, `is_system_generated`, `created_at`, `updated_at`) VALUES
-(1, 1, 1, 'created', 'Case automatically created from low rating', 'Case created from 2-star product review', NULL, 0, 1, '2025-05-23 16:39:47', '2025-05-23 16:39:47');
+(1, 1, 1, 'created', 'Case automatically created from low rating', 'Case created from 2-star product review', NULL, 0, 1, '2025-05-23 16:39:47', '2025-05-23 16:39:47'),
+(2, 1, 14, 'assigned', 'Case assigned to Customer Service Rep', 'Case assigned to Customer Service Rep', '\"{\\\"old_assigned_to\\\":null,\\\"new_assigned_to\\\":14}\"', 1, 0, '2025-05-23 17:07:27', '2025-05-23 17:07:27'),
+(3, 2, 3, 'created', 'Case automatically created from low rating', 'Case created from 3-star product review', NULL, 0, 1, '2025-05-23 17:18:10', '2025-05-23 17:18:10'),
+(4, 1, 1, 'status_changed', 'Status changed from in_progress to closed', 'Status updated to closed', '\"{\\\"old_status\\\":\\\"in_progress\\\",\\\"new_status\\\":\\\"closed\\\",\\\"reason\\\":null}\"', 1, 0, '2025-05-24 09:44:03', '2025-05-24 09:44:03'),
+(5, 2, 14, 'assigned', 'Case assigned to Customer Service Rep', 'Case assigned to Customer Service Rep', '\"{\\\"old_assigned_to\\\":null,\\\"new_assigned_to\\\":14}\"', 1, 0, '2025-05-24 09:50:36', '2025-05-24 09:50:36'),
+(6, 2, 14, 'status_changed', 'Status changed from in_progress to resolved', 'Status updated to resolved', '\"{\\\"old_status\\\":\\\"in_progress\\\",\\\"new_status\\\":\\\"resolved\\\",\\\"reason\\\":null}\"', 1, 0, '2025-05-24 09:51:02', '2025-05-24 09:51:02');
 
 -- --------------------------------------------------------
 
@@ -107,7 +112,8 @@ CREATE TABLE `customer_service_cases` (
 --
 
 INSERT INTO `customer_service_cases` (`id`, `case_number`, `product_comment_id`, `customer_id`, `product_id`, `assigned_to`, `status`, `priority`, `category`, `subject`, `description`, `resolution`, `internal_notes`, `assigned_at`, `first_response_at`, `resolved_at`, `closed_at`, `response_time_hours`, `resolution_time_hours`, `created_at`, `updated_at`) VALUES
-(1, 'CS-2025-001', 1, 1, 1, NULL, 'open', 'high', 'product_quality', 'Low rating (2 stars) for MacBook Pro 16\"', 'Customer left a 2-star review: \"This product is not good quality. Very disappointed.\"', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-05-23 16:39:47', '2025-05-23 16:39:47');
+(1, 'CS-2025-001', 1, 1, 1, 14, 'closed', 'high', 'product_quality', 'Low rating (2 stars) for MacBook Pro 16\"', 'Customer left a 2-star review: \"This product is not good quality. Very disappointed.\"', NULL, NULL, '2025-05-23 17:07:27', NULL, '2025-05-24 09:44:03', '2025-05-24 09:44:03', NULL, 17, '2025-05-23 16:39:47', '2025-05-24 09:44:03'),
+(2, 'CS-2025-002', 2, 3, 5, 14, 'resolved', 'low', 'product_quality', 'Low rating (3 stars) for AirPods Pro', 'Customer left a 3-star review: \"good\"', NULL, NULL, '2025-05-24 09:50:36', NULL, '2025-05-24 09:51:02', NULL, NULL, 17, '2025-05-23 17:18:10', '2025-05-24 09:51:02');
 
 -- --------------------------------------------------------
 
@@ -241,7 +247,12 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 (24, '2024_03_20_add_certificate_columns_to_users', 5),
 (25, '2025_05_23_193140_create_product_comments_table', 6),
 (26, '2025_05_23_193149_create_customer_service_cases_table', 7),
-(27, '2025_05_23_193208_create_case_activities_table', 8);
+(27, '2025_05_23_193208_create_case_activities_table', 8),
+(28, '2025_05_24_193300_create_oauth_auth_codes_table', 9),
+(29, '2025_05_24_193301_create_oauth_access_tokens_table', 9),
+(30, '2025_05_24_193302_create_oauth_refresh_tokens_table', 9),
+(31, '2025_05_24_193303_create_oauth_clients_table', 9),
+(32, '2025_05_24_193304_create_oauth_personal_access_clients_table', 9);
 
 -- --------------------------------------------------------
 
@@ -350,6 +361,8 @@ INSERT INTO `model_has_roles` (`role_id`, `model_type`, `model_id`) VALUES
 (3, 'App\\Models\\User', 9),
 (3, 'App\\Models\\User', 11),
 (3, 'App\\Models\\User', 12),
+(3, 'App\\Models\\User', 16),
+(3, 'App\\Models\\User', 17),
 (4, 'App\\Models\\User', 10),
 (4, 'App\\Models\\User', 13),
 (5, 'App\\Models\\User', 14);
@@ -369,6 +382,100 @@ CREATE TABLE `notifications` (
   `read_at` timestamp NULL DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `oauth_access_tokens`
+--
+
+CREATE TABLE `oauth_access_tokens` (
+  `id` varchar(100) NOT NULL,
+  `user_id` bigint(20) UNSIGNED DEFAULT NULL,
+  `client_id` char(36) NOT NULL,
+  `name` varchar(255) DEFAULT NULL,
+  `scopes` text DEFAULT NULL,
+  `revoked` tinyint(1) NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `expires_at` datetime DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `oauth_auth_codes`
+--
+
+CREATE TABLE `oauth_auth_codes` (
+  `id` varchar(100) NOT NULL,
+  `user_id` bigint(20) UNSIGNED NOT NULL,
+  `client_id` char(36) NOT NULL,
+  `scopes` text DEFAULT NULL,
+  `revoked` tinyint(1) NOT NULL,
+  `expires_at` datetime DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `oauth_clients`
+--
+
+CREATE TABLE `oauth_clients` (
+  `id` char(36) NOT NULL,
+  `user_id` bigint(20) UNSIGNED DEFAULT NULL,
+  `name` varchar(255) NOT NULL,
+  `secret` varchar(100) DEFAULT NULL,
+  `provider` varchar(255) DEFAULT NULL,
+  `redirect` text NOT NULL,
+  `personal_access_client` tinyint(1) NOT NULL,
+  `password_client` tinyint(1) NOT NULL,
+  `revoked` tinyint(1) NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `oauth_clients`
+--
+
+INSERT INTO `oauth_clients` (`id`, `user_id`, `name`, `secret`, `provider`, `redirect`, `personal_access_client`, `password_client`, `revoked`, `created_at`, `updated_at`) VALUES
+('9efd7a6f-0d5d-4681-b4b6-a9df5955a505', NULL, 'Laravel Personal Access Client', 'iXvrjCLYUrUPUvb3Y5NfwD4kSvIyfprhTEz7ltF5', NULL, 'http://localhost', 1, 0, 0, '2025-05-24 16:33:00', '2025-05-24 16:33:00'),
+('9efd7a6f-13f9-4ada-a1e7-57fb38dfb20d', NULL, 'Laravel Password Grant Client', 'X8KAqgmxTxPwLKAoQ525bLEusjkNJzPYedp4z2M1', 'users', 'http://localhost', 0, 1, 0, '2025-05-24 16:33:00', '2025-05-24 16:33:00');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `oauth_personal_access_clients`
+--
+
+CREATE TABLE `oauth_personal_access_clients` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `client_id` char(36) NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `oauth_personal_access_clients`
+--
+
+INSERT INTO `oauth_personal_access_clients` (`id`, `client_id`, `created_at`, `updated_at`) VALUES
+(1, '9efd7a6f-0d5d-4681-b4b6-a9df5955a505', '2025-05-24 16:33:00', '2025-05-24 16:33:00');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `oauth_refresh_tokens`
+--
+
+CREATE TABLE `oauth_refresh_tokens` (
+  `id` varchar(100) NOT NULL,
+  `access_token_id` varchar(100) NOT NULL,
+  `revoked` tinyint(1) NOT NULL,
+  `expires_at` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -395,7 +502,8 @@ CREATE TABLE `orders` (
 --
 
 INSERT INTO `orders` (`id`, `user_id`, `total_amount`, `status`, `cancelled_by`, `cancelled_at`, `shipping_address`, `billing_address`, `created_at`, `updated_at`) VALUES
-(1, 3, 249.99, 'pending', NULL, NULL, NULL, NULL, '2025-05-23 16:43:46', '2025-05-23 16:43:46');
+(1, 3, 249.99, 'delivered', NULL, NULL, NULL, NULL, '2025-05-23 16:43:46', '2025-05-23 17:09:11'),
+(2, 3, 249.99, 'pending', NULL, NULL, NULL, NULL, '2025-05-24 10:02:32', '2025-05-24 10:02:32');
 
 -- --------------------------------------------------------
 
@@ -418,7 +526,8 @@ CREATE TABLE `order_items` (
 --
 
 INSERT INTO `order_items` (`id`, `order_id`, `product_id`, `quantity`, `price`, `created_at`, `updated_at`) VALUES
-(1, 1, 5, 1, 249.99, '2025-05-23 16:43:46', '2025-05-23 16:43:46');
+(1, 1, 5, 1, 249.99, '2025-05-23 16:43:46', '2025-05-23 16:43:46'),
+(2, 2, 5, 1, 249.99, '2025-05-24 10:02:32', '2025-05-24 10:02:32');
 
 -- --------------------------------------------------------
 
@@ -512,11 +621,11 @@ CREATE TABLE `products` (
 --
 
 INSERT INTO `products` (`id`, `code`, `name`, `model`, `description`, `main_photo`, `additional_photos`, `price`, `stock_quantity`, `photo`, `created_at`, `updated_at`) VALUES
-(1, 'LAPTOP-001', 'MacBook Pro 16\"', 'Apple MacBook Pro 2023', 'Powerful laptop with M2 Pro chip, 16GB RAM, 512GB SSD', NULL, NULL, 2499.99, 50, 'macbook.jpg', '2025-05-19 19:01:11', '2025-05-19 19:01:11'),
-(2, 'PHONE-001', 'iPhone 15 Pro', 'Apple iPhone 15 Pro 256GB', 'Latest iPhone with A17 Pro chip, 256GB storage, and amazing camera system', NULL, NULL, 1099.99, 100, 'iphone.jpg', '2025-05-19 19:01:11', '2025-05-19 19:01:11'),
-(3, 'TABLET-001', 'iPad Air', 'Apple iPad Air 2022', 'Sleek tablet with M1 chip, 10.9-inch display, and 256GB storage', NULL, NULL, 749.99, 75, 'ipad.jpg', '2025-05-19 19:01:11', '2025-05-19 19:01:11'),
-(4, 'LAPTOP-002', 'Dell XPS 15', 'Dell XPS 15 9530', 'Premium Windows laptop with 13th Gen Intel Core i7, 16GB RAM, 1TB SSD', NULL, NULL, 1899.99, 30, 'dell.jpg', '2025-05-19 19:01:11', '2025-05-19 19:01:11'),
-(5, 'ACCESSORY-001', 'AirPods Pro', 'Apple AirPods Pro 2nd Gen', 'Wireless earbuds with active noise cancellation and spatial audio', NULL, NULL, 249.99, 149, 'airpods.jpg', '2025-05-19 19:01:11', '2025-05-23 16:43:37');
+(1, 'Tea-001', 'Oolong Tea', 'Tea', 'Partially oxidized, falling between green and black tea. Hand-rolled varieties like Tie Guan Yin and Wuyi Rock Tea are prized for their complex flavors.', '1748099514_6831e1ba65586.jpg', NULL, 249.99, 50, 'macbook.jpg', '2025-05-19 19:01:11', '2025-05-24 12:11:54'),
+(2, 'Tea-003', 'Pu-erh Tea', 'Tea', 'A fermented tea from Yunnan, China, often aged and hand-pressed into cakes or bricks. Available as raw (sheng) or ripe (shou).', '1748099659_6831e24b5db68.jpg', NULL, 249.99, 100, 'iphone.jpg', '2025-05-19 19:01:11', '2025-05-24 12:14:19'),
+(3, 'Pot-001', 'Tea pot', 'Pot', 'The Best Style for your collection', '1748098679_6831de778b6a3.jpg', NULL, 799.99, 75, 'ipad.jpg', '2025-05-19 19:01:11', '2025-05-24 11:57:59'),
+(4, 'Tea-002', 'Black tea', 'Tea', 'Fully oxidized leaves, resulting in a robust flavor. Popular handmade varieties include Darjeeling, Assam, and Keemun.', '1748099251_6831e0b3291e4.jpg', NULL, 249.99, 30, 'dell.jpg', '2025-05-19 19:01:11', '2025-05-24 12:07:31'),
+(5, 'ACCESSORY-001', 'Green Tea', 'Handmade Tea', 'Made from unoxidized Camellia sinensis leaves, often hand-rolled or pan-fired to preserve freshness. Examples include Dragonwell (Longjing), Sencha, and Matcha', '1748098994_6831dfb23c45e.jpg', NULL, 249.99, 148, 'airpods.jpg', '2025-05-19 19:01:11', '2025-05-24 12:03:14');
 
 -- --------------------------------------------------------
 
@@ -543,7 +652,8 @@ CREATE TABLE `product_comments` (
 --
 
 INSERT INTO `product_comments` (`id`, `product_id`, `user_id`, `rating`, `comment`, `is_verified_purchase`, `is_approved`, `approved_at`, `approved_by`, `created_at`, `updated_at`) VALUES
-(1, 1, 1, 2, 'This product is not good quality. Very disappointed.', 1, 1, '2025-05-23 16:39:47', NULL, '2025-05-23 16:39:47', '2025-05-23 16:39:47');
+(1, 1, 1, 2, 'This product is not good quality. Very disappointed.', 1, 1, '2025-05-23 16:39:47', NULL, '2025-05-23 16:39:47', '2025-05-23 16:39:47'),
+(2, 5, 3, 3, 'good', 1, 1, '2025-05-23 17:18:10', 3, '2025-05-23 17:18:10', '2025-05-23 17:18:10');
 
 -- --------------------------------------------------------
 
@@ -695,9 +805,9 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `name`, `email`, `email_verified_at`, `password`, `credits`, `remember_token`, `management_level`, `created_at`, `updated_at`, `google_id`, `linkedin_id`, `theme_dark_mode`, `theme_color`, `certificate_serial`, `certificate_dn`, `last_certificate_login`) VALUES
-(1, 'Admin User', 'admin@example.com', NULL, '$2y$12$NQDVUJB.XQ.85/ZgF1LZJutznVLfJP40qBb3dtDuSP0CDqAdXFL6i', 12000.00, NULL, NULL, '2025-05-19 19:01:11', '2025-05-23 10:28:14', NULL, NULL, 1, 'default', NULL, NULL, NULL),
+(1, 'Admin User', 'admin@example.com', NULL, '$2y$12$NQDVUJB.XQ.85/ZgF1LZJutznVLfJP40qBb3dtDuSP0CDqAdXFL6i', 12000.00, NULL, NULL, '2025-05-19 19:01:11', '2025-05-24 12:08:45', NULL, NULL, 0, 'default', NULL, NULL, NULL),
 (2, 'Employee User', 'employee@example.com', NULL, '$2y$12$E0Ut/DMNWnuUEiL9jHbbnOI2NeaT9LCJeny1/cNirIx5u/RPa7eDW', 12000.00, NULL, NULL, '2025-05-19 19:01:11', '2025-05-19 19:01:11', NULL, NULL, 0, 'default', NULL, NULL, NULL),
-(3, 'Customer One', 'customer1@example.com', NULL, '$2y$12$xAXCk0y80mqPRt5C8B//nemqo7eZU4DdvfsVs2euhX3ETOp9ws3gK', 4750.01, NULL, NULL, '2025-05-19 19:01:11', '2025-05-23 16:43:46', NULL, NULL, 0, 'default', NULL, NULL, NULL),
+(3, 'Customer One', 'customer1@example.com', NULL, '$2y$12$xAXCk0y80mqPRt5C8B//nemqo7eZU4DdvfsVs2euhX3ETOp9ws3gK', 4500.02, NULL, NULL, '2025-05-19 19:01:11', '2025-05-24 10:02:32', NULL, NULL, 0, 'default', NULL, NULL, NULL),
 (4, 'Customer Two', 'customer2@example.com', NULL, '$2y$12$xQu9SrCWALs4Q.vCqngtseAbunSfss2r4kUUknM4AeBCCmCCxTauG', 8000.00, NULL, NULL, '2025-05-19 19:01:11', '2025-05-19 19:01:11', NULL, NULL, 0, 'default', NULL, NULL, NULL),
 (5, 'ahmed_customer', 'customer@gamil.com', NULL, '$2y$12$SIODrIqjPY5KG5mPFtJaR.uxYtBp4UhMB4MQsu1LNedvJ2T107xTC', 0.00, NULL, NULL, '2025-05-19 21:12:13', '2025-05-23 10:16:25', NULL, NULL, 1, 'calm', NULL, NULL, NULL),
 (7, 'Ahmed Mohamed', 'ahmedabdallah14.2005@gmail.com', '2025-05-23 10:33:51', '$2y$12$xywWmNKMzka8dyejpUQRvewkfJZlNDvuH9ENiF7kd4ThpaZcdpi5W', 1000.00, NULL, NULL, '2025-05-23 10:33:51', '2025-05-23 10:33:51', '116162219353671623217', NULL, 0, 'default', NULL, NULL, NULL),
@@ -705,7 +815,9 @@ INSERT INTO `users` (`id`, `name`, `email`, `email_verified_at`, `password`, `cr
 (12, 'ahmed mo', 'aaa@gmail.com', NULL, '$2y$12$4UDaguIxRv1CXhxPzTCtT.xH0yjPDpu4kyg3vE0zweMeH5AwRzwxq', 0.00, NULL, NULL, '2025-05-23 14:14:32', '2025-05-23 14:14:32', NULL, NULL, 0, 'default', NULL, NULL, NULL),
 (13, 'Editor User', 'editor@example.com', NULL, '$2y$12$tVZG1v4tet6skx6XzgNxeO.Mn5m89sxD1vc2EGF66zjaPT6f6LvyW', 12000.00, NULL, 'high', '2025-05-23 15:04:01', '2025-05-23 15:04:01', NULL, NULL, 0, 'default', NULL, NULL, NULL),
 (14, 'Customer Service Rep', 'customerservice@example.com', '2025-05-23 15:29:30', '$2y$12$v2XLwMOxf3509kYWDDJmkuYKFNiGRLk8y0ig5nQvV2MMHT3/yAdc.', 12000.00, NULL, 'low', '2025-05-23 15:29:30', '2025-05-23 15:29:30', NULL, NULL, 0, 'default', NULL, NULL, NULL),
-(15, 'Test Admin', 'test-admin@example.com', NULL, '$2y$12$WEKMCpnqCCfHCf5uHiQdHO1PiuK8j6Ipjvj65lY.4DON53wKBhx7C', 12000.00, NULL, 'high', '2025-05-23 15:50:23', '2025-05-23 15:50:23', NULL, NULL, 0, 'default', NULL, NULL, NULL);
+(15, 'Test Admin', 'test-admin@example.com', NULL, '$2y$12$WEKMCpnqCCfHCf5uHiQdHO1PiuK8j6Ipjvj65lY.4DON53wKBhx7C', 12000.00, NULL, 'high', '2025-05-23 15:50:23', '2025-05-23 15:50:23', NULL, NULL, 0, 'default', NULL, NULL, NULL),
+(16, 'mohamed salah', 'mohamedsalah.l183@outlook.com', NULL, '$2y$12$uwXiKKwGqi/HPypDfathke7FnnuVTrNXqMiRWFv/iOjzCo0PKa0u.', 0.00, NULL, NULL, '2025-05-24 10:09:04', '2025-05-24 10:09:04', NULL, NULL, 0, 'default', NULL, NULL, NULL),
+(17, 'mohamed salah', 'mohamed230104460@sut.edu.eg', NULL, '$2y$12$EcnjTMfhujVS8VEkcuzt/.adKWF2UToa6nrTQIkhwFdQDCEtDK8N6', 0.00, NULL, NULL, '2025-05-24 10:10:33', '2025-05-24 10:10:33', NULL, NULL, 0, 'default', NULL, NULL, NULL);
 
 --
 -- Indexes for dumped tables
@@ -811,6 +923,40 @@ ALTER TABLE `notifications`
   ADD KEY `notifications_notifiable_type_notifiable_id_index` (`notifiable_type`,`notifiable_id`);
 
 --
+-- Indexes for table `oauth_access_tokens`
+--
+ALTER TABLE `oauth_access_tokens`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `oauth_access_tokens_user_id_index` (`user_id`);
+
+--
+-- Indexes for table `oauth_auth_codes`
+--
+ALTER TABLE `oauth_auth_codes`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `oauth_auth_codes_user_id_index` (`user_id`);
+
+--
+-- Indexes for table `oauth_clients`
+--
+ALTER TABLE `oauth_clients`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `oauth_clients_user_id_index` (`user_id`);
+
+--
+-- Indexes for table `oauth_personal_access_clients`
+--
+ALTER TABLE `oauth_personal_access_clients`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `oauth_refresh_tokens`
+--
+ALTER TABLE `oauth_refresh_tokens`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `oauth_refresh_tokens_access_token_id_index` (`access_token_id`);
+
+--
 -- Indexes for table `orders`
 --
 ALTER TABLE `orders`
@@ -893,13 +1039,13 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `case_activities`
 --
 ALTER TABLE `case_activities`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `customer_service_cases`
 --
 ALTER TABLE `customer_service_cases`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `failed_jobs`
@@ -929,19 +1075,25 @@ ALTER TABLE `jobs`
 -- AUTO_INCREMENT for table `migrations`
 --
 ALTER TABLE `migrations`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
+
+--
+-- AUTO_INCREMENT for table `oauth_personal_access_clients`
+--
+ALTER TABLE `oauth_personal_access_clients`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `order_items`
 --
 ALTER TABLE `order_items`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `permissions`
@@ -959,7 +1111,7 @@ ALTER TABLE `products`
 -- AUTO_INCREMENT for table `product_comments`
 --
 ALTER TABLE `product_comments`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `roles`
@@ -971,7 +1123,7 @@ ALTER TABLE `roles`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- Constraints for dumped tables
