@@ -220,4 +220,121 @@ class User extends Authenticatable
 
         return true;
     }
+
+    /**
+     * Get user's last login attempts
+     */
+    public function loginAttempts()
+    {
+        return $this->hasMany(LoginAttempt::class);
+    }
+
+    /**
+     * Get user's active sessions
+     */
+    public function activeSessions()
+    {
+        return $this->hasMany(Session::class)->where('last_activity', '>', now()->subHours(2)->timestamp);
+    }
+
+    /**
+     * Check if user's password needs to be changed
+     */
+    public function passwordNeedsChange(): bool
+    {
+        $lastPasswordChange = $this->password_changed_at ?? $this->created_at;
+        $maxPasswordAge = config('auth.password_lifetime', 90); // 90 days default
+        return $lastPasswordChange->addDays($maxPasswordAge)->isPast();
+    }
+
+    /**
+     * Get user's security score (0-100)
+     */
+    public function getSecurityScore(): int
+    {
+        $score = 0;
+        
+        // Base checks (50 points total)
+        if ($this->email_verified_at) $score += 10;
+        if (strlen($this->password) >= 12) $score += 10;
+        if ($this->two_factor_enabled) $score += 15;
+        if (!$this->passwordNeedsChange()) $score += 15;
+        
+        // Additional security measures (50 points total)
+        if ($this->certificate_serial) $score += 15;
+        if ($this->recovery_email) $score += 10;
+        if ($this->security_questions_set) $score += 10;
+        if ($this->last_security_audit) $score += 15;
+        
+        return min(100, $score);
+    }
+
+    /**
+     * Get user's notification preferences
+     */
+    public function notificationPreferences()
+    {
+        return $this->hasOne(NotificationPreference::class);
+    }
+
+    /**
+     * Check if user has completed profile
+     */
+    public function hasCompleteProfile(): bool
+    {
+        $requiredFields = [
+            'name',
+            'email',
+            'phone',
+            'address',
+            'date_of_birth',
+            'recovery_email'
+        ];
+
+        foreach ($requiredFields as $field) {
+            if (empty($this->$field)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Get profile completion percentage
+     */
+    public function getProfileCompletionPercentage(): int
+    {
+        $fields = [
+            'name' => 15,
+            'email' => 15,
+            'phone' => 10,
+            'address' => 15,
+            'date_of_birth' => 10,
+            'recovery_email' => 10,
+            'profile_picture' => 10,
+            'bio' => 5,
+            'social_links' => 5,
+            'security_questions_set' => 5
+        ];
+
+        $score = 0;
+        foreach ($fields as $field => $weight) {
+            if (!empty($this->$field)) {
+                $score += $weight;
+            }
+        }
+
+        return min(100, $score);
+    }
+
+    protected $dates = [
+        'created_at',
+        'updated_at',
+        'email_verified_at',
+        'last_login_at',
+        'password_changed_at',
+        'last_security_audit',
+        'last_certificate_login'
+    ];
 }
