@@ -128,17 +128,6 @@
                                 <div class="hover-effect"></div>
                             </a>
                             
-                            <a href="{{ route('login.linkedin') }}" class="social-login-btn">
-                                <div class="btn-content">
-                                    <div class="icon-wrapper linkedin">
-                                        <i class="bi bi-linkedin"></i>
-                                        <div class="tea-leaf-overlay"></div>
-                                        <div class="ripple-effect"></div>
-                                    </div>
-                                    <span>Continue with LinkedIn</span>
-                                </div>
-                                <div class="hover-effect"></div>
-                            </a>
                             
                             <a href="{{ route('login.facebook') }}" class="social-login-btn">
                                 <div class="btn-content">
@@ -163,8 +152,22 @@
                                 </div>
                                 <div class="hover-effect"></div>
                             </a>
+
+                            <a href="{{ route('login.linkedin') }}" class="social-login-btn">
+                                <div class="btn-content">
+                                    <div class="icon-wrapper linkedin">
+                                        <i class="bi bi-linkedin"></i>
+                                        <div class="tea-leaf-overlay"></div>
+                                        <div class="ripple-effect"></div>
+                                    </div>
+                                    <span>Continue with LinkedIn</span>
+                                </div>
+                                <div class="hover-effect"></div>
+                            </a>
+                            
                         </div>
                     </div>
+
                     
                     <p class="mt-4 text-center fade-in" style="animation-delay: 0.6s">
                         New to Tea Haven? 

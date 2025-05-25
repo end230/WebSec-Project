@@ -26,7 +26,7 @@ Route::get('/products', [ProductController::class, 'index']);
 Route::get('/products/{id}', [ProductController::class, 'show']);
 
 // Protected customer-only routes
-Route::middleware(['auth:api', 'customer'])->group(function () {
+Route::middleware(['auth:api', 'role:Customer'])->group(function () {
     // Auth routes
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/profile', [AuthController::class, 'profile']);
