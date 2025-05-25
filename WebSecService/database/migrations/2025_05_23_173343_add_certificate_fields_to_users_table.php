@@ -12,10 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->string('certificate_cn')->nullable()->after('github_id');
-            $table->string('certificate_serial')->nullable()->after('certificate_cn');
-            $table->text('certificate_dn')->nullable()->after('certificate_serial');
-            $table->timestamp('last_certificate_login')->nullable()->after('certificate_dn');
+            $table->string('certificate_cn')->nullable();
+            $table->string('certificate_serial')->nullable();
+            $table->string('certificate_dn', 1000)->nullable();
         });
     }
 
@@ -25,12 +24,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn([
-                'certificate_cn',
-                'certificate_serial', 
-                'certificate_dn',
-                'last_certificate_login'
-            ]);
+            $table->dropColumn(['certificate_cn', 'certificate_serial', 'certificate_dn']);
         });
     }
 };
